@@ -384,12 +384,16 @@ function tryListen(port, attemptsLeft = 5) {
 (async () => {
   try {
     const syncOptions = process.env.NODE_ENV === 'production' ? {} : { alter: true };
-    await sequelize.sync(syncOptions);
-    if (!process.env.ELECTRON) {
-      tryListen(PORT, 5);
+    if (!process.env.VERCEL) {
+      await sequelize.sync(syncOptions);
+      if (!process.env.ELECTRON) {
+        tryListen(PORT, 5);
+      }
     }
   } catch (err) {
     console.error('Failed to sync database:', err);
-    process.exit(1);
+    if (!process.env.VERCEL) {
+      process.exit(1);
+    }
   }
 })();
