@@ -22,8 +22,8 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
     */
-    
-import express from "express";
+    import 'dotenv/config';
+    import express from "express";
 import path from "path";
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
