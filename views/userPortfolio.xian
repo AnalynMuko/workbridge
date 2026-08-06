@@ -1,0 +1,128 @@
+{{> head }}
+<body class="bg-gray-50">
+  <div class="container mx-auto px-6 py-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <button onclick="(function(){ if(document.referrer && document.referrer !== window.location.href){ window.history.back(); } else { window.location.href='{{#if owner}}/profile/{{owner.id}}{{else}}/profile{{/if}}'; } })()" class="px-3 py-2 bg-gray-100 border rounded text-sm">← Back</button>
+          <h1 class="text-2xl font-bold">Portfolio</h1>
+        </div>
+        {{#if currentUser}}
+          {{#ifEquals currentUser.id owner.id}}
+            <a href="/portfolio/new" class="px-3 py-2 bg-red-600 text-white rounded">Add New Project</a>
+          {{/ifEquals}}
+        {{else}}
+          {{#unless publicView}}
+            <a href="/portfolio/new" class="px-3 py-2 bg-red-600 text-white rounded">Add New Project</a>
+          {{/unless}}
+        {{/if}}
+      </div>
+
+      {{#if form}}
+        <div class="bg-white p-6 rounded shadow">
+          <form action="/portfolio/new" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label class="text-sm">Title</label>
+              <input name="title" required class="w-full border rounded px-3 py-2" />
+            </div>
+            <div class="mb-3">
+              <label class="text-sm">Category / Skill</label>
+              <input name="category" class="w-full border rounded px-3 py-2" placeholder="e.g. Web Developer, Writer, Graphic Designer" />
+            </div>
+            <div class="mb-3">
+              <label class="text-sm">Description</label>
+              <textarea name="description" class="w-full border rounded px-3 py-2"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="text-sm">Links (comma separated)</label>
+              <input name="links" class="w-full border rounded px-3 py-2" placeholder="https://example.com, https://blog.example.com" />
+            </div>
+            <div class="mb-3">
+              <label class="text-sm">Upload files (images, pdf)</label>
+              <input name="files" type="file" multiple class="w-full" />
+            </div>
+            <div class="flex gap-2">
+              <button class="px-4 py-2 bg-red-600 text-white rounded">Save</button>
+              <a href="/portfolio" class="px-4 py-2 border rounded">Cancel</a>
+            </div>
+          </form>
+        </div>
+      {{/if}}
+
+      {{#if edit}}
+        <div class="bg-white p-6 rounded shadow">
+          <form action="/portfolio/{{entry.id}}/edit" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label class="text-sm">Title</label>
+              <input name="title" value="{{entry.title}}" required class="w-full border rounded px-3 py-2" />
+            </div>
+            <div class="mb-3">
+              <label class="text-sm">Category</label>
+              <input name="category" value="{{entry.category}}" class="w-full border rounded px-3 py-2" />
+            </div>
+            <div class="mb-3">
+              <label class="text-sm">Description</label>
+              <textarea name="description" class="w-full border rounded px-3 py-2">{{entry.description}}</textarea>
+            </div>
+            <div class="mb-3">
+              <label class="text-sm">Links</label>
+              <input name="links" value="{{entry.links}}" class="w-full border rounded px-3 py-2" />
+            </div>
+            <div class="mb-3">
+              <label class="text-sm">Add more files</label>
+              <input name="files" type="file" multiple class="w-full" />
+            </div>
+            <div class="flex gap-2">
+              <button class="px-4 py-2 bg-red-600 text-white rounded">Update</button>
+              <a href="/portfolio" class="px-4 py-2 border rounded">Cancel</a>
+            </div>
+          </form>
+        </div>
+      {{/if}}
+
+      {{#if entries}}
+        <div class="mt-6 space-y-4">
+          {{#each entries}}
+            <div class="bg-white p-4 rounded shadow flex items-start gap-4">
+              <div class="w-28 h-20 bg-gray-100 rounded overflow-hidden flex items-center justify-center">
+                {{#if this.files}}
+                  {{#with (jsonParse this.files)}}
+                    {{#if this.length}}
+                      {{#ifEquals this.[0].mimetype 'application/pdf'}}
+                        <div class="text-xs text-gray-600">PDF</div>
+                      {{else}}
+                        <img src="/uploads/portfolio/{{this.[0].filename}}" class="w-full h-full object-cover" />
+                      {{/ifEquals}}
+                    {{/if}}
+                  {{/with}}
+                {{/if}}
+              </div>
+              <div class="flex-1">
+                <h4 class="font-semibold">{{this.title}}</h4>
+                <div class="text-sm text-gray-600">{{this.category}}</div>
+                <p class="text-sm mt-2 text-gray-700">{{this.description}}</p>
+                {{#if this.links}}<div class="mt-2 text-sm"><strong>Links:</strong> {{this.links}}</div>{{/if}}
+                {{#if currentUser}}
+                  {{#ifEquals currentUser.id this.userId}}
+                    <div class="mt-3 flex gap-2">
+                      <a href="/portfolio/{{this.id}}/edit" class="px-3 py-1 border rounded text-sm">Edit</a>
+                      <form action="/portfolio/{{this.id}}/delete" method="POST" onsubmit="return confirm('Delete this project?');">
+                        <button class="px-3 py-1 border rounded text-sm">Delete</button>
+                      </form>
+                    </div>
+                  {{/ifEquals}}
+                {{/if}}
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="bg-white p-6 rounded shadow text-center text-gray-600">No portfolio projects yet. Add your first project to showcase your work.</div>
+      {{/if}}
+
+    </div>
+  </div>
+
+  
+</body>
+</html>

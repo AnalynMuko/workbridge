@@ -1,0 +1,41 @@
+{{> head }}
+<body class="bg-white">
+  <nav class="sticky top-0 z-50 bg-white shadow-md">
+    <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex-shrink-0">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-red-600 bg-clip-text text-transparent">WorkBridge</h1>
+      </div>
+      <div class="flex gap-4">
+        <a href="/" class="text-gray-700 hover:text-red-600">Home</a>
+        <a href="/about" class="text-gray-700 hover:text-red-600">About</a>
+        <a href="/contact" class="text-gray-700 hover:text-red-600">Contact</a>
+        <a href="/login" class="bg-gradient-to-r from-yellow-500 to-red-600 text-white px-4 py-2 rounded-lg">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="py-20">
+    <div class="container mx-auto px-6">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-4xl font-bold text-gray-900 mb-6 text-center">Frequently Asked Questions</h2>
+        <div class="space-y-6">
+          <div>
+            <h3 class="text-2xl font-semibold">How does WorkBridge work?</h3>
+            <p class="text-gray-600">WorkBridge connects freelancers and clients via project listings, bookings and status tracking.</p>
+          </div>
+          <div>
+            <h3 class="text-2xl font-semibold">How do I get paid?</h3>
+            <p class="text-gray-600">Payments are handled via our secure escrow system. You can withdraw to supported payout methods.</p>
+          </div>
+          <div>
+            <h3 class="text-2xl font-semibold">Is there a verification process?</h3>
+            <p class="text-gray-600">Yes — we request ID verification during profile setup for trust and safety.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  
+
+</body>

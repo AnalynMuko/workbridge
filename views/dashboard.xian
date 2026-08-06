@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WorkBridge Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
+    }
+
+    .animate-slide-in-down {
+      animation: slideInDown 0.6s ease-out;
+    }
+
+    .animate-fade-in-up {
+      animation: fadeInUp 0.8s ease-out forwards;
+      opacity: 0;
+    }
+
+    .animate-scale-in {
+      animation: scaleIn 0.5s ease-out forwards;
+      opacity: 0;
+    }
+
+    .animate-pulse-slow {
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    .shimmer {
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      background-size: 1000px 100%;
+      animation: shimmer 2s infinite;
+    }
+
+    .delay-100 { animation-delay: 0.1s; }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-300 { animation-delay: 0.3s; }
+    .delay-400 { animation-delay: 0.4s; }
+    .delay-500 { animation-delay: 0.5s; }
+    .delay-600 { animation-delay: 0.6s; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .stat-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transition: left 0.5s;
+    }
+
+    .stat-card:hover::before {
+      left: 100%;
+    }
+
+    .modal-backdrop {
+      backdrop-filter: blur(4px);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 via-white to-gray-50 min-h-screen">
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100 animate-slide-in-down">
+    <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+      <!-- Left: Logo -->
+      <div class="flex-shrink-0">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-red-600 bg-clip-text text-transparent hover:scale-105 transition-transform cursor-pointer">
+          WorkBridge
+        </h1>
+      </div>
+
+      <!-- Middle: Navigation Links -->
+      <div class="hidden md:flex gap-8 flex-1 justify-center">
+        <a href="/dashboard" class="text-red-600 font-medium transition-all relative group">
+          Dashboard
+          <span class="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600"></span>
+        </a>
+        <a href="/browse" class="text-gray-700 hover:text-red-600 font-medium transition-all relative group">
+          Browse Jobs
+          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-600 transition-all group-hover:w-full"></span>
+        </a>
+        <a href="/profile" class="text-gray-700 hover:text-red-600 font-medium transition-all relative group">
+          Profile
+          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-600 transition-all group-hover:w-full"></span>
+        </a>
+      </div>
+
+      <!-- Right: Logout Button -->
+      <div class="flex-shrink-0">
+        <a href="/logout" class="bg-gradient-to-r from-yellow-500 to-red-600 text-white px-6 py-2 rounded-lg font-medium hover:shadow-xl transition-all hover:scale-105">
+          Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto px-6 py-8">
+    <!-- Welcome Section -->
+    <div class="bg-gradient-to-r from-yellow-500 to-red-600 rounded-2xl shadow-lg p-8 mb-8 text-white relative overflow-hidden animate-fade-in-up">
+      <div class="absolute inset-0 opacity-20">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -mr-32 -mt-32"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full -ml-24 -mb-24"></div>
+      </div>
+      <div class="flex items-center justify-between relative z-10">
+        <div>
+          <h1 class="text-4xl font-bold mb-2 animate-pulse-slow">Welcome back! 👋</h1>
+          <p class="text-yellow-50 text-lg">Here's what's happening with your WorkBridge account today</p>
+        </div>
+        <div class="text-6xl hidden md:block transform hover:scale-110 transition-transform">💼</div>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid md:grid-cols-4 gap-6 mb-8">
+      <!-- Jobs Posted -->
+      <div class="stat-card bg-white rounded-2xl shadow-md hover:shadow-2xl p-6 transition-all duration-300 transform hover:-translate-y-2 animate-scale-in delay-100">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-gray-600 font-semibold">Jobs Posted</h3>
+          <div class="text-3xl transform hover:scale-125 transition-transform">📝</div>
+        </div>
+        <p id="jobsPosted" class="text-4xl font-bold bg-gradient-to-r from-yellow-500 to-red-600 bg-clip-text text-transparent">0</p>
+        <p id="jobsPostedDelta" class="text-sm text-gray-500 mt-2">&nbsp;</p>
+      </div>
+
+      <!-- Active Applications -->
+      <div class="stat-card bg-white rounded-2xl shadow-md hover:shadow-2xl p-6 transition-all duration-300 transform hover:-translate-y-2 animate-scale-in delay-200">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-gray-600 font-semibold">Active Applications</h3>
+          <div class="text-3xl transform hover:scale-125 transition-transform">📬</div>
+        </div>
+        <p id="activeApplications" class="text-4xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">0</p>
+        <p id="activeApplicationsDelta" class="text-sm text-gray-500 mt-2">&nbsp;</p>
+      </div>
+
+      <!-- Total Earnings -->
+      <div class="stat-card bg-white rounded-2xl shadow-md hover:shadow-2xl p-6 transition-all duration-300 transform hover:-translate-y-2 animate-scale-in delay-300">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-gray-600 font-semibold">Total Earnings</h3>
+          <div class="text-3xl transform hover:scale-125 transition-transform">💰</div>
+        </div>
+        <p id="totalEarnings" class="text-4xl font-bold bg-gradient-to-r from-green-500 to-emerald-600 bg-clip-text text-transparent">$0</p>
+        <p id="totalEarningsDelta" class="text-sm text-gray-500 mt-2">&nbsp;</p>
+      </div>
+
+      <!-- Completion Rate -->
+      <div class="stat-card bg-white rounded-2xl shadow-md hover:shadow-2xl p-6 transition-all duration-300 transform hover:-translate-y-2 animate-scale-in delay-400">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-gray-600 font-semibold">Completion Rate</h3>
+          <div class="text-3xl transform hover:scale-125 transition-transform">⭐</div>
+        </div>
+        <p id="completionRate" class="text-4xl font-bold bg-gradient-to-r from-yellow-500 to-orange-600 bg-clip-text text-transparent">0%</p>
+        <p id="completionRateNote" class="text-sm text-gray-500 mt-2">&nbsp;</p>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-2xl shadow-md hover:shadow-lg p-6 mb-8 transition-all animate-fade-in-up delay-500">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-2xl">⚡</span>
+        Quick Actions
+      </h2>
+      <div class="grid md:grid-cols-3 gap-4">
+        <button 
+          onclick="openPostModal()" 
+          class="px-6 py-4 bg-gradient-to-r from-yellow-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-2xl transition-all transform hover:scale-105 hover:-translate-y-1 flex items-center justify-center gap-2"
+        >
+          <span class="text-xl">➕</span>
+          Post New Job
+        </button>
+        <a 
+          href="/browse" 
+          class="px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-xl font-semibold hover:shadow-2xl transition-all transform hover:scale-105 hover:-translate-y-1 flex items-center justify-center gap-2"
+        >
+          <span class="text-xl">🔍</span>
+          Browse Freelancers
+        </a>
+        <a 
+          href="/profile" 
+          class="px-6 py-4 bg-gradient-to-r from-purple-500 to-purple-700 text-white rounded-xl font-semibold hover:shadow-2xl transition-all transform hover:scale-105 hover:-translate-y-1 flex items-center justify-center gap-2"
+        >
+          <span class="text-xl">👤</span>
+          Edit Profile
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid lg:grid-cols-3 gap-8">
+      <!-- Recent Jobs Posted -->
+      <div class="lg:col-span-2 animate-fade-in-up delay-600">
+        <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all p-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <span class="text-2xl">📋</span>
+            Recent Jobs Posted
+          </h2>
+          
+          <!-- Job Item 1 -->
+          <div class="border-b border-gray-200 pb-5 mb-5 hover:bg-gray-50 p-4 rounded-lg transition-all group">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 group-hover:text-red-600 transition-colors">Web Developer Needed</h3>
+                <p class="text-sm text-gray-500 mt-1">Posted 2 days ago</p>
+              </div>
+              <span class="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                Active
+              </span>
+            </div>
+            <p class="text-gray-700 mb-3 leading-relaxed">Build a responsive e-commerce platform with React and Node.js</p>
+            <div class="flex items-center justify-between">
+              <div class="flex gap-4">
+                <span class="text-sm text-gray-600 font-medium">💰 $5,000</span>
+                <span class="text-sm text-gray-600 font-medium">👤 12 applications</span>
+              </div>
+              <a href="#" class="text-red-600 font-semibold hover:text-red-700 transition-all hover:translate-x-1 inline-flex items-center gap-1">
+                View Details 
+                <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Job Item 2 -->
+          <div class="border-b border-gray-200 pb-5 mb-5 hover:bg-gray-50 p-4 rounded-lg transition-all group">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 group-hover:text-red-600 transition-colors">Logo Design for Startup</h3>
+                <p class="text-sm text-gray-500 mt-1">Posted 1 week ago</p>
+              </div>
+              <span class="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                Active
+              </span>
+            </div>
+            <p class="text-gray-700 mb-3 leading-relaxed">Modern logo design for tech startup - multiple concepts required</p>
+            <div class="flex items-center justify-between">
+              <div class="flex gap-4">
+                <span class="text-sm text-gray-600 font-medium">💰 $1,500</span>
+                <span class="text-sm text-gray-600 font-medium">👤 8 applications</span>
+              </div>
+              <a href="#" class="text-red-600 font-semibold hover:text-red-700 transition-all hover:translate-x-1 inline-flex items-center gap-1">
+                View Details 
+                <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Job Item 3 -->
+          <div class="pb-4 hover:bg-gray-50 p-4 rounded-lg transition-all group">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 group-hover:text-red-600 transition-colors">Content Writing - Blog Posts</h3>
+                <p class="text-sm text-gray-500 mt-1">Posted 3 days ago</p>
+              </div>
+              <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1">
+                <span class="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></span>
+                In Progress
+              </span>
+            </div>
+            <p class="text-gray-700 mb-3 leading-relaxed">10 high-quality blog posts about digital marketing trends</p>
+            <div class="flex items-center justify-between">
+              <div class="flex gap-4">
+                <span class="text-sm text-gray-600 font-medium">💰 $800</span>
+                <span class="text-sm text-gray-600 font-medium">👤 15 applications</span>
+              </div>
+              <a href="#" class="text-red-600 font-semibold hover:text-red-700 transition-all hover:translate-x-1 inline-flex items-center gap-1">
+                View Details 
+                <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-gray-200">
+            <a href="/browse" class="text-red-600 font-semibold hover:text-red-700 inline-flex items-center gap-2 hover:gap-3 transition-all">
+              View all jobs 
+              <span>→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar: Activity & Messages -->
+      <div class="space-y-6">
+        <!-- Recent Activity -->
+        <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all p-6 animate-fade-in-up delay-600">
+          <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <span class="text-xl">📊</span>
+            Recent Activity
+          </h3>
+          
+          <div id="recentActivity" class="space-y-3">
+            <div class="flex items-center gap-3 animate-pulse">
+              <div class="w-10 h-10 bg-gray-200 rounded-full"></div>
+              <div class="flex-1">
+                <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Deadlines -->
+        <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all p-6 animate-fade-in-up delay-600">
+          <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <span class="text-xl">📅</span>
+            Upcoming Deadlines
+          </h3>
+          
+          <div id="upcomingDeadlines" class="space-y-3">
+            <div class="animate-pulse">
+              <div class="h-16 bg-gray-200 rounded-lg mb-3"></div>
+              <div class="h-16 bg-gray-200 rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-300 py-8 mt-16">
+    <div class="container mx-auto px-6 text-center">
+      <p class="text-sm">&copy; 2024 WorkBridge. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Post Job Modal -->
+  <div id="postModal" class="hidden fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-scale-in">
+      <div class="sticky top-0 bg-gradient-to-r from-yellow-500 to-red-600 text-white px-8 py-6 flex items-center justify-between rounded-t-2xl">
+        <h2 class="text-2xl font-bold">Post a New Hiring Opportunity</h2>
+        <button onclick="closePostModal()" class="text-white hover:text-gray-200 text-2xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-all">✕</button>
+      </div>
+
+      <form method="POST" action="/browse/post" class="p-8 space-y-6">
+        <div>
+          <label for="jobTitle" class="block text-sm font-semibold text-gray-700 mb-2">Job Title</label>
+          <input type="text" id="jobTitle" name="jobTitle" placeholder="e.g., Web Developer, Logo Designer, Content Writer" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 transition-all" required />
+        </div>
+
+        <div>
+          <label for="jobCategory" class="block text-sm font-semibold text-gray-700 mb-2">Job Category</label>
+          <select id="jobCategory" name="jobCategory" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 transition-all" required>
+            <option value="">Select a category</option>
+            <option value="web-development">Web Development</option>
+            <option value="mobile-development">Mobile Development</option>
+            <option value="graphic-design">Graphic Design</option>
+            <option value="content-writing">Content Writing</option>
+            <option value="digital-marketing">Digital Marketing</option>
+            <option value="video-editing">Video Editing</option>
+            <option value="ui-ux-design">UI/UX Design</option>
+            <option value="data-analysis">Data Analysis</option>
+            <option value="virtual-assistant">Virtual Assistant</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="jobDescription" class="block text-sm font-semibold text-gray-700 mb-2">Job Description</label>
+          <textarea id="jobDescription" name="jobDescription" rows="5" placeholder="Describe the job details, requirements, and what you're looking for..." class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 transition-all resize-none" required></textarea>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <label for="budget" class="block text-sm font-semibold text-gray-700 mb-2">Budget</label>
+            <input type="number" id="budget" name="budget" placeholder="Budget amount" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 transition-all" required />
+          </div>
+          <div>
+            <label for="currency" class="block text-sm font-semibold text-gray-700 mb-2">Currency</label>
+            <select id="currency" name="currency" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 transition-all">
+              <option value="USD">USD ($)</option>
+              <option value="EUR">EUR (€)</option>
+              <option value="GBP">GBP (£)</option>
+              <option value="PHP">PHP (₱)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="requirements" class="block text-sm font-semibold text-gray-700 mb-2">Requirements (one per line)</label>
+          <textarea id="requirements" name="requirements" rows="3" placeholder="e.g., TOR\nCollege Degree\nPortfolio" class="w-full px-4 py-3 border border-gray-300 rounded-xl"></textarea>
+          <p class="text-xs text-gray-500 mt-1">Optional: list documents or qualifications applicants must upload when applying.</p>
+        </div>
+
+        <div>
+          <label for="deadline" class="block text-sm font-semibold text-gray-700 mb-2">Deadline</label>
+          <input type="date" id="deadline" name="deadline" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 transition-all" required />
+        </div>
+
+        <div class="flex justify-end gap-4 border-t border-gray-200 pt-6">
+          <button type="button" onclick="closePostModal()" class="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-all hover:scale-105">Cancel</button>
+          <button type="submit" class="px-6 py-3 bg-gradient-to-r from-yellow-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-2xl transition-all hover:scale-105">Post Job</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function openPostModal() {
+      document.getElementById('postModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePostModal() {
+      document.getElementById('postModal').classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+
+    document.getElementById('postModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closePostModal();
+      }
+    });
+
+    // Dashboard realtime polling
+    async function fetchAccountStatus() {
+      try {
+        const res = await fetch('/api/me/status');
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // Stats
+        document.getElementById('jobsPosted').textContent = data.stats.jobsPosted || 0;
+        document.getElementById('activeApplications').textContent = data.stats.activeApplications || 0;
+        document.getElementById('totalEarnings').textContent = '$' + (data.stats.totalEarnings || 0);
+        document.getElementById('completionRate').textContent = (data.stats.completionRate || 0) + '%';
+
+        // Recent activity
+        const act = document.getElementById('recentActivity');
+        act.innerHTML = '';
+        const msgs = document.createElement('div');
+        msgs.className = 'flex items-start gap-3 p-3 hover:bg-gray-50 rounded-lg transition-all';
+        msgs.innerHTML = `<div class="text-2xl">💬</div><div><p class="text-sm font-semibold text-gray-900">Messages</p><p class="text-xs text-gray-600">You have ${data.stats.newMessages || 0} new messages</p></div>`;
+        act.appendChild(msgs);
+
+        // upcoming deadlines
+        const upcoming = document.getElementById('upcomingDeadlines');
+        upcoming.innerHTML = '';
+        if (data.upcoming && data.upcoming.length) {
+          data.upcoming.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'p-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-500 rounded-lg hover:shadow-md transition-all';
+            el.innerHTML = `<p class="text-sm font-semibold text-yellow-900">${item.deadline}</p><p class="text-xs text-yellow-700 mt-1">${item.title}</p>`;
+            upcoming.appendChild(el);
+          });
+        } else {
+          upcoming.innerHTML = '<div class="text-sm text-gray-500 text-center py-4">No upcoming deadlines.</div>';
+        }
+      } catch (err) {
+        console.error('fetchAccountStatus error', err);
+      }
+    }
+
+    // Initial fetch and interval
+    fetchAccountStatus();
+    setInterval(fetchAccountStatus, 5000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{{> head }}
+<body class="bg-white">
+  {{> head }}
+  <nav class="sticky top-0 z-50 bg-white shadow-md">
+    <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex-shrink-0">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-red-600 bg-clip-text text-transparent">WorkBridge</h1>
+      </div>
+      <div class="flex gap-4">
+        <a href="/" class="text-gray-700 hover:text-red-600">Home</a>
+        <a href="/contact" class="text-gray-700 hover:text-red-600">Contact</a>
+        <a href="/login" class="bg-gradient-to-r from-yellow-500 to-red-600 text-white px-4 py-2 rounded-lg">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="py-20">
+    <div class="container mx-auto px-6">
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="text-4xl font-bold text-gray-900 mb-6">About WorkBridge</h2>
+        <p class="text-lg text-gray-700 mb-6">WorkBridge is revolutionizing the freelance industry by providing a seamless platform where businesses and professionals connect, collaborate, and thrive. Our mission is to bridge the gap between talent and opportunity.</p>
+        <p class="text-gray-600">With over 10,000+ successful projects completed, we've built a community where quality work meets fair compensation. Join thousands of satisfied freelancers and clients today.</p>
+      </div>
+    </div>
+  </main>
+
+  
+
+</body>

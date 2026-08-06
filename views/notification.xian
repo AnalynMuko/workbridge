@@ -1,0 +1,89 @@
+{{> head }}
+<body class="bg-gray-50">
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-50 bg-white shadow-md">
+    <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+      <!-- Left: Logo -->
+      <div class="flex-shrink-0">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-red-600 bg-clip-text text-transparent">
+          WorkBridge
+        </h1>
+      </div>
+
+      <!-- Middle: Navigation Links -->
+      <div class="hidden md:flex gap-8 flex-1 justify-center">
+        <a href="/dashboard" class="text-gray-700 hover:text-red-600 font-medium transition">Dashboard</a>
+        <a href="/browse" class="text-gray-700 hover:text-red-600 font-medium transition">Browse Jobs</a>
+        <a href="/profile" class="text-gray-700 hover:text-red-600 font-medium transition">Profile</a>
+      </div>
+
+      <!-- Right: Logout Button -->
+      <div class="flex-shrink-0">
+        <a href="/logout" class="bg-gradient-to-r from-yellow-500 to-red-600 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg transition">
+          Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto px-6 py-8">
+    <div class="max-w-2xl mx-auto">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">Notifications</h1>
+        <p class="text-gray-600">Stay updated with all your WorkBridge activities</p>
+      </div>
+
+      <!-- Notification Filters -->
+      <div class="bg-white rounded-xl shadow-md p-4 mb-6 flex flex-wrap gap-2">
+        <button class="px-4 py-2 bg-red-600 text-white rounded-full font-semibold hover:bg-red-700 transition">All</button>
+        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full font-semibold hover:bg-gray-300 transition">Applications</button>
+        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full font-semibold hover:bg-gray-300 transition">Messages</button>
+        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full font-semibold hover:bg-gray-300 transition">Updates</button>
+        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full font-semibold hover:bg-gray-300 transition">Payments</button>
+      </div>
+
+      <!-- Notifications List -->
+      <div class="space-y-4">
+        {{#if notifications}}
+          {{#each notifications}}
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 {{#ifEquals this.type 'application'}}border-blue-500{{/ifEquals}}{{#ifEquals this.type 'message'}}border-green-500{{/ifEquals}}{{#ifEquals this.type 'reply'}}border-purple-500{{/ifEquals}} hover:shadow-lg transition">
+              <div class="flex items-start gap-4">
+                <div class="text-3xl">{{#ifEquals this.type 'application'}}🎉{{else}}{{#ifEquals this.type 'message'}}💬{{else}}{{#ifEquals this.type 'reply'}}📝{{else}}🔔{{/ifEquals}}{{/ifEquals}}{{/ifEquals}}</div>
+                <div class="flex-1">
+                  <h3 class="font-bold text-gray-900 text-lg">{{#ifEquals this.type 'application'}}New Application{{else}}{{#ifEquals this.type 'message'}}New Message{{else}}{{#ifEquals this.type 'reply'}}New Reply{{else}}Notification{{/ifEquals}}{{/ifEquals}}{{/ifEquals}}</h3>
+                  <p class="text-gray-700 mt-1">
+                    {{#if this.fromUser}}<span class="font-semibold">{{this.fromUser.name}}</span>{{else}}Someone{{/if}} 
+                    {{#ifEquals this.type 'application'}}applied to your job{{/ifEquals}}
+                    {{#ifEquals this.type 'message'}}sent you a message{{/ifEquals}}
+                    {{#ifEquals this.type 'reply'}}replied to your post{{/ifEquals}}
+                  </p>
+                  <div class="flex items-center gap-4 mt-3">
+                    <p class="text-sm text-gray-600">{{createdAt}}</p>
+                    {{#ifEquals this.type 'message'}}<a href="/messages?with={{this.data.fromUserId}}" class="text-red-600 font-semibold hover:text-red-700">View Message →</a>{{/ifEquals}}
+                    {{#ifEquals this.type 'application'}}<a href="/jobs/{{this.data.jobId}}" class="text-red-600 font-semibold hover:text-red-700">View Job →</a>{{/ifEquals}}
+                  </div>
+                </div>
+                <form method="POST" action="/notification/{{id}}/read">
+                  <button class="text-gray-400 hover:text-gray-600">✕</button>
+                </form>
+              </div>
+            </div>
+          {{/each}}
+        {{else}}
+          <div class="bg-white rounded-xl shadow-md p-6 text-center text-gray-500">No notifications</div>
+        {{/if}}
+      </div>
+
+      <!-- Load More -->
+      <div class="text-center mt-8">
+        <button class="px-6 py-3 border-2 border-red-600 text-red-600 rounded-lg font-semibold hover:bg-red-50 transition">
+          Load More Notifications
+        </button>
+      </div>
+    </div>
+  </div>
+
+  
+</body>
+</html>

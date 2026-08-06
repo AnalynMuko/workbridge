@@ -1,0 +1,462 @@
+{{> head }}
+<body class="bg-gray-50">
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-50 bg-white shadow-md">
+    <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex-shrink-0">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-red-600 bg-clip-text text-transparent">WorkBridge</h1>
+      </div>
+      <div class="hidden md:flex gap-8 flex-1 justify-center">
+        <a href="/dashboard" class="text-gray-700 hover:text-red-600 font-medium transition">Dashboard</a>
+        <a href="/browse" class="text-red-600 font-medium transition border-b-2 border-red-600">Browse Jobs</a>
+        <a href="/profile" class="text-gray-700 hover:text-red-600 font-medium transition">Profile</a>
+      </div>
+      <div class="flex-shrink-0">
+        <a href="/logout" class="bg-gradient-to-r from-yellow-500 to-red-600 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg transition">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Left Sidebar (desktop) -->
+  <div class="fixed left-0 top-20 h-screen w-20 bg-white shadow-lg flex flex-col items-center py-6 gap-4 z-40 hidden sm:flex">
+    <a href="/dashboard" class="p-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition text-2xl" title="Dashboard">📊</a>
+    <a href="/notification" class="p-3 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition text-2xl relative" title="Notifications">🔔
+      {{#if unreadNotifications}}
+        <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">{{unreadNotifications}}</span>
+      {{/if}}
+    </a>
+    <a href="/messages" class="p-3 rounded-lg bg-green-600 text-white hover:bg-green-700 transition text-2xl relative" title="Messages">💬
+      {{#if unreadMessages}}
+        <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">{{unreadMessages}}</span>
+      {{/if}}
+    </a>
+    <a href="/portfolio" class="p-3 rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition text-2xl" title="Portfolio">🖼️</a>
+    <a href="/profile" class="p-3 rounded-lg bg-orange-600 text-white hover:bg-orange-700 transition text-2xl" title="Profile">👤</a>
+  </div>
+
+  <!-- Mobile bottom nav (visible on small screens) -->
+  <div class="fixed bottom-0 left-0 right-0 h-16 bg-white shadow-lg flex items-center justify-around z-50 sm:hidden">
+    <a href="/dashboard" class="flex-1 text-center text-2xl">📊</a>
+    <a href="/notification" class="flex-1 text-center text-2xl relative">🔔{{#if unreadNotifications}}<span class="absolute -top-2 right-6 bg-red-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">{{unreadNotifications}}</span>{{/if}}</a>
+    <a href="/messages" class="flex-1 text-center text-2xl relative">💬{{#if unreadMessages}}<span class="absolute -top-2 right-10 bg-red-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">{{unreadMessages}}</span>{{/if}}</a>
+    <a href="/portfolio" class="flex-1 text-center text-2xl">🖼️</a>
+    <a href="/profile" class="flex-1 text-center text-2xl">👤</a>
+  </div>
+
+  <div class="ml-0 sm:ml-20 container mx-auto px-6 py-8 pb-20 sm:pb-8">
+    {{#if showWelcome}}
+      <div class="bg-green-50 border border-green-200 text-green-800 p-4 rounded-lg mb-6"><strong>Welcome!</strong> Your profile is complete. Start browsing jobs now.</div>
+    {{/if}}
+
+    <!-- Job Post Composer (card) -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+      <!-- Search bar for categories or job descriptions -->
+      <form method="GET" action="/browse" class="mb-4">
+        <div class="grid md:grid-cols-3 gap-3 items-end">
+          <div class="md:col-span-2">
+            <label class="sr-only">Search jobs</label>
+            <input name="q" type="search" placeholder="Search category or job description" class="w-full px-3 py-2 border border-gray-200 rounded-lg" {{#if q}}value="{{q}}"{{/if}} />
+          </div>
+          <div>
+            <label class="sr-only">Category</label>
+            <select name="category" class="w-full px-3 py-2 border border-gray-200 rounded-lg">
+              <option value="">All categories</option>
+              <option value="web-development" {{#ifEquals category 'web-development'}}selected{{/ifEquals}}>Web Development</option>
+              <option value="graphic-design" {{#ifEquals category 'graphic-design'}}selected{{/ifEquals}}>Graphic Design</option>
+              <option value="content-writing" {{#ifEquals category 'content-writing'}}selected{{/ifEquals}}>Content Writing</option>
+              <option value="digital-marketing" {{#ifEquals category 'digital-marketing'}}selected{{/ifEquals}}>Digital Marketing</option>
+              <option value="other" {{#ifEquals category 'other'}}selected{{/ifEquals}}>Other</option>
+            </select>
+          </div>
+          <div class="md:col-span-3 text-right">
+            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-red-600 text-white rounded-lg font-semibold">Search</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Quick user search: goes directly to user's profile when found -->
+      <form method="GET" action="/user-search" class="mb-4" onsubmit="return false;">
+        <div class="grid md:grid-cols-3 gap-3 items-end">
+          <div class="md:col-span-2 relative">
+            <label class="sr-only">Search users</label>
+            <input id="userSearchInput" name="q" type="search" placeholder="Search user by name (e.g. John Doe)" autocomplete="off" class="w-full px-3 py-2 border border-gray-200 rounded-lg" />
+            <div id="userSearchResults" class="absolute left-0 right-0 mt-1 bg-white border rounded shadow-md z-50 hidden max-h-60 overflow-auto"></div>
+          </div>
+          <div class="md:col-span-1 text-right">
+            <button id="userSearchBtn" type="submit" class="px-4 py-2 bg-white border rounded-lg">Search User</button>
+          </div>
+        </div>
+      </form>
+
+      {{#if searchedUser}}
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+          <div class="md:flex md:items-start md:gap-6">
+            <div class="md:w-1/3 flex items-center gap-4">
+              <div class="w-28 h-28 rounded-full bg-gradient-to-r from-yellow-500 to-red-600 flex items-center justify-center text-white text-3xl font-bold">
+                {{#if searchedUser.profile.avatar}}
+                  <img src="/uploads/{{searchedUser.profile.avatar}}" alt="avatar" class="w-full h-full object-cover rounded-full" />
+                {{else}}
+                  {{#if searchedUser.user.name}}
+                    {{searchedUser.user.name.[0]}}
+                  {{else}}?
+                  {{/if}}
+                {{/if}}
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-gray-900">{{searchedUser.user.name}}</h3>
+                {{#if searchedUser.user.email}}<div class="text-sm text-gray-600">{{searchedUser.user.email}}</div>{{/if}}
+                {{#if searchedUser.profile.bio}}<p class="text-sm text-gray-700 mt-2">{{searchedUser.profile.bio}}</p>{{/if}}
+                <div class="mt-3">
+                  <a href="/profile/{{searchedUser.user.id}}" class="px-3 py-1 bg-red-600 text-white rounded text-sm">View Full Profile</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="md:flex-1 mt-4 md:mt-0">
+              <h4 class="text-lg font-semibold mb-3">Portfolio</h4>
+              {{#if searchedUser.portfolios.length}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {{#each searchedUser.portfolios}}
+                    <div class="border rounded p-3 bg-gray-50">
+                      <div class="h-32 bg-white rounded overflow-hidden flex items-center justify-center mb-2">
+                        {{#if this.files.length}}
+                          {{#ifEquals this.files.[0].mimetype 'application/pdf'}}
+                            <div class="text-xs text-gray-600">PDF</div>
+                          {{else}}
+                            <img src="/uploads/portfolio/{{this.files.[0].filename}}" class="w-full h-full object-cover" />
+                          {{/ifEquals}}
+                        {{else}}
+                          <div class="text-xs text-gray-400">No preview</div>
+                        {{/if}}
+                      </div>
+                      <div class="font-semibold">{{this.title}}</div>
+                      {{#if this.category}}<div class="text-xs text-gray-500">{{this.category}}</div>{{/if}}
+                      {{#if this.links}}<div class="text-sm text-gray-600 mt-2">Links: {{this.links}}</div>{{/if}}
+                    </div>
+                  {{/each}}
+                </div>
+              {{else}}
+                <div class="text-sm text-gray-500">This user has no portfolio projects yet.</div>
+              {{/if}}
+            </div>
+          </div>
+        </div>
+      {{/if}}
+
+      <!-- Collapsible Job Composer: compact input expands into the full form when focused/clicked -->
+      <div id="job-composer" class="bg-white rounded-xl shadow-md p-4 mb-6">
+        <div id="composer-collapsed" class="cursor-text" onclick="openComposer()" onkeydown="if(event.key==='Enter'){openComposer();}" tabindex="0">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-gray-900">Create a Job Post</h3>
+            <button type="button" onclick="openComposer(); event.stopPropagation();" class="text-sm text-gray-500">Expand</button>
+          </div>
+          <input id="composerQuick" type="text" placeholder="Write a job title or short description..." class="w-full mt-3 px-3 py-2 border border-gray-200 rounded-lg" onfocus="openComposer()" />
+        </div>
+
+        <form id="composer-expanded" method="POST" action="/browse/post" class="mt-4 space-y-4 hidden" onsubmit="closeComposer();">
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm font-medium text-gray-700">Job Title</label>
+              <input id="jobTitle" name="jobTitle" required class="w-full px-3 py-2 border border-gray-200 rounded-lg" placeholder="e.g., Senior Frontend Developer" />
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700">Position</label>
+              <input name="position" class="w-full px-3 py-2 border border-gray-200 rounded-lg" placeholder="e.g., Full-time, Contract, Part-time" />
+            </div>
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-4">
+            <div>
+              <label class="text-sm font-medium text-gray-700">Category</label>
+              <select name="jobCategory" class="w-full px-3 py-2 border border-gray-200 rounded-lg">
+                <option value="">Select category</option>
+                <option value="web-development">Web Development</option>
+                <option value="graphic-design">Graphic Design</option>
+                <option value="content-writing">Content Writing</option>
+                <option value="digital-marketing">Digital Marketing</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700">Budget</label>
+              <input name="budget" type="number" class="w-full px-3 py-2 border border-gray-200 rounded-lg" placeholder="e.g., 1500" />
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700">Currency</label>
+              <select name="currency" class="w-full px-3 py-2 border border-gray-200 rounded-lg">
+                <option value="USD">USD</option>
+                <option value="PHP">PHP</option>
+                <option value="EUR">EUR</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-sm font-medium text-gray-700">Short Description</label>
+            <textarea id="jobDescription" name="jobDescription" rows="3" class="w-full px-3 py-2 border border-gray-200 rounded-lg" placeholder="Summarize the job and requirements" required></textarea>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm font-medium text-gray-700">Deadline</label>
+              <input name="deadline" type="date" class="w-full px-3 py-2 border border-gray-200 rounded-lg" />
+            </div>
+            <div class="flex items-end justify-end gap-2">
+              <button type="button" onclick="closeComposer()" class="px-4 py-2 border rounded text-gray-700">Cancel</button>
+              <button type="submit" class="px-6 py-2 bg-gradient-to-r from-yellow-500 to-red-600 text-white rounded-lg font-semibold">Post Job</button>
+            </div>
+          </div>
+          <div>
+            <label class="text-sm font-medium text-gray-700">Requirements (one per line)</label>
+            <textarea name="requirements" rows="3" class="w-full px-3 py-2 border border-gray-200 rounded-lg" placeholder="e.g., TOR\nCollege Degree\nPortfolio"></textarea>
+            <p class="text-xs text-gray-500 mt-1">If you require documents from applicants, list them here. Applicants will be prompted to upload matching files when applying.</p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Posts Feed -->
+    <div class="space-y-4 mb-8">
+      {{#if posts.length}}
+        {{#each posts}}
+          <div class="bg-white rounded-xl shadow-md p-4">
+            <div class="flex items-start gap-3">
+              <div>
+                {{#if posterAvatar}}
+                  <img src="/uploads/{{posterAvatar}}" alt="avatar" class="w-12 h-12 rounded-full object-cover" />
+                {{else}}
+                  <div class="w-12 h-12 bg-gradient-to-r from-yellow-500 to-red-600 rounded-full flex items-center justify-center text-white font-bold">👤</div>
+                {{/if}}
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="font-semibold text-gray-900">{{posterName}}</div>
+                    <div class="text-xs text-gray-500">{{createdAt}}</div>
+                  </div>
+                </div>
+                <p class="mt-3 text-gray-800">{{content}}</p>
+              </div>
+            </div>
+          </div>
+        {{/each}}
+      {{else}}
+        <div class="bg-white rounded-xl shadow-md p-4">No posts yet. Be the first to post!</div>
+      {{/if}}
+    </div>
+
+    <!-- Jobs Feed -->
+    <div class="space-y-6">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4">Available Hiring Opportunities</h2>
+      {{#if jobs}}
+        {{#each jobs}}
+          <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition relative">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <h3 class="text-xl font-bold text-gray-900">{{title}}</h3>
+                  {{#if category}}<span class="bg-gray-100 text-gray-800 text-xs font-semibold px-3 py-1 rounded-full">{{category}}</span>{{/if}}
+                </div>
+                {{#if position}}<div class="text-sm text-gray-700 font-medium mb-1">Position: {{position}}</div>{{/if}}
+                <p class="text-sm text-gray-600">Posted by: <span class="font-semibold">{{posterName}}</span> • {{createdAt}}</p>
+              </div>
+              <div class="text-right flex items-start gap-3">
+                <p class="text-2xl font-bold text-red-600">{{#if budget}}{{budget}}{{else}}—{{/if}}</p>
+                <p class="text-sm text-gray-600">{{currency}}</p>
+                {{#if currentUserId}}
+                  {{#ifEquals currentUserId posterId}}
+                    <div class="ml-2 relative">
+                      <button onclick="toggleMenu('{{id}}')" class="text-gray-500 hover:text-gray-700">⋯</button>
+                      <div id="menu-{{id}}" class="hidden absolute right-0 mt-2 w-36 bg-white border rounded shadow-md z-50">
+                        <a href="/browse/post/{{id}}/edit" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>
+                        <form method="POST" action="/browse/post/{{id}}/delete">
+                          <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Delete</button>
+                        </form>
+                      </div>
+                    </div>
+                  {{/ifEquals}}
+                {{/if}}
+              </div>
+            </div>
+            <p class="text-gray-700 mb-4">{{description}}</p>
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+              <div class="flex items-center gap-4">
+                <p class="text-sm text-gray-600">⏰ Deadline: {{deadline}}</p>
+                <p class="text-sm text-gray-600">👤 Proposals: 0</p>
+              </div>
+              <a href="/messages?with={{posterId}}&jobId={{id}}" class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-red-600 text-white rounded-lg font-semibold inline-block">View & Apply</a>
+            </div>
+          </div>
+        {{/each}}
+      {{else}}
+        <div class="bg-white rounded-xl shadow-md p-6">No jobs found.</div>
+      {{/if}}
+    </div>
+
+    <div class="text-center mt-12">
+      <button class="px-6 py-3 border-2 border-red-600 text-red-600 rounded-lg font-semibold hover:bg-red-50 transition">Load More Jobs</button>
+    </div>
+  </div>
+
+  
+
+  <!-- Post Job Modal (unchanged) -->
+  <div id="postModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div class="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 flex items-center justify-between">
+        <h2 class="text-2xl font-bold text-gray-900">Post a New Hiring Opportunity</h2>
+        <button onclick="closePostModal()" class="text-gray-500 hover:text-gray-700 text-2xl font-bold">✕</button>
+      </div>
+      <form method="POST" action="/browse/post" class="p-8 space-y-6">
+        <div>
+          <label for="jobTitle" class="block text-sm font-semibold text-gray-700 mb-2">Job Title</label>
+          <input type="text" id="jobTitle" name="jobTitle" placeholder="e.g., Web Developer, Logo Designer, Content Writer" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200" required />
+        </div>
+        <div>
+          <label for="jobCategory" class="block text-sm font-semibold text-gray-700 mb-2">Job Category</label>
+          <select id="jobCategory" name="jobCategory" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200" required>
+            <option value="">Select a category</option>
+            <option value="web-development">Web Development</option>
+            <option value="mobile-development">Mobile Development</option>
+            <option value="graphic-design">Graphic Design</option>
+            <option value="content-writing">Content Writing</option>
+            <option value="digital-marketing">Digital Marketing</option>
+            <option value="video-editing">Video Editing</option>
+            <option value="ui-ux-design">UI/UX Design</option>
+            <option value="data-analysis">Data Analysis</option>
+            <option value="virtual-assistant">Virtual Assistant</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label for="jobDescription" class="block text-sm font-semibold text-gray-700 mb-2">Job Description</label>
+          <textarea id="jobDescription" name="jobDescription" rows="5" placeholder="Describe the job details, requirements, and what you're looking for..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200" required></textarea>
+        </div>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <label for="budget" class="block text-sm font-semibold text-gray-700 mb-2">Budget</label>
+            <input type="number" id="budget" name="budget" placeholder="Budget amount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200" required />
+          </div>
+          <div>
+            <label for="currency" class="block text-sm font-semibold text-gray-700 mb-2">Currency</label>
+            <select id="currency" name="currency" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200">
+              <option value="USD">USD ($)</option>
+              <option value="EUR">EUR (€)</option>
+              <option value="GBP">GBP (£)</option>
+              <option value="PHP">PHP (₱)</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="deadline" class="block text-sm font-semibold text-gray-700 mb-2">Deadline</label>
+          <input type="date" id="deadline" name="deadline" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200" required />
+        </div>
+        <div class="flex justify-end gap-4 border-t border-gray-200 pt-6">
+          <button type="button" onclick="closePostModal()" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition">Cancel</button>
+          <button type="submit" class="px-6 py-2 bg-gradient-to-r from-yellow-500 to-red-600 text-white rounded-lg font-semibold hover:shadow-lg transition">Post Job</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function openPostModal() { document.getElementById('postModal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+    function closePostModal() { document.getElementById('postModal').classList.add('hidden'); document.body.style.overflow = 'auto'; }
+    function toggleMenu(id) {
+      const el = document.getElementById('menu-' + id);
+      if (!el) return;
+      el.classList.toggle('hidden');
+    }
+
+    // Collapsible composer handlers
+    function openComposer(){
+      const collapsed = document.getElementById('composer-collapsed');
+      const expanded = document.getElementById('composer-expanded');
+      if(!collapsed || !expanded) return;
+      collapsed.classList.add('hidden');
+      expanded.classList.remove('hidden');
+      // focus on the first input
+      const first = expanded.querySelector('input, textarea, select');
+      if(first) first.focus();
+    }
+    function closeComposer(){
+      const collapsed = document.getElementById('composer-collapsed');
+      const expanded = document.getElementById('composer-expanded');
+      if(!collapsed || !expanded) return;
+      expanded.classList.add('hidden');
+      collapsed.classList.remove('hidden');
+      // clear quick input text
+      const quick = document.getElementById('composerQuick');
+      if(quick) quick.value = '';
+    }
+
+    // Close composer on Escape
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeComposer(); });
+
+    // User search autocomplete
+    (function(){
+      const input = document.getElementById('userSearchInput');
+      const results = document.getElementById('userSearchResults');
+      const btn = document.getElementById('userSearchBtn');
+      if(!input || !results) return;
+
+      let items = [];
+      let selected = -1;
+      let timer = null;
+
+      function clearResults(){ items = []; selected = -1; results.innerHTML = ''; results.classList.add('hidden'); }
+
+      function render(){
+        if(!items.length){ clearResults(); return; }
+        results.innerHTML = items.map((it, idx) => `<div data-idx="${idx}" data-id="${it.id}" class="px-3 py-2 cursor-pointer hover:bg-gray-100 ${idx===selected? 'bg-gray-100':''}">${escapeHtml(it.name)}</div>`).join('');
+        results.classList.remove('hidden');
+      }
+
+      function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[m]; }); }
+
+      async function fetchSuggestions(q){
+        try{
+          const res = await fetch('/api/users?q=' + encodeURIComponent(q));
+          if(!res.ok) return;
+          const data = await res.json();
+          items = Array.isArray(data) ? data : [];
+          selected = -1;
+          render();
+        }catch(e){ console.error('autocomplete error', e); }
+      }
+
+      input.addEventListener('input', (e)=>{
+        const v = e.target.value.trim();
+        if(timer) clearTimeout(timer);
+        if(!v){ clearResults(); return; }
+        timer = setTimeout(()=> fetchSuggestions(v), 220);
+      });
+
+      input.addEventListener('keydown', (e)=>{
+        if(!items.length) return;
+        if(e.key === 'ArrowDown'){ e.preventDefault(); selected = Math.min(selected+1, items.length-1); render(); }
+        else if(e.key === 'ArrowUp'){ e.preventDefault(); selected = Math.max(selected-1, 0); render(); }
+        else if(e.key === 'Enter'){ e.preventDefault(); if(selected >= 0 && items[selected]){ window.location = '/profile/' + items[selected].id; } else { document.location = '/user-search?q=' + encodeURIComponent(input.value.trim()); } }
+        else if(e.key === 'Escape'){ clearResults(); }
+      });
+
+      results.addEventListener('click', (e)=>{
+        const el = e.target.closest('[data-id]');
+        if(!el) return;
+        const id = el.getAttribute('data-id');
+        if(id) window.location = '/profile/' + id;
+      });
+
+      // fallback: search button (if user types and clicks Search User)
+      if(btn){ btn.addEventListener('click', ()=>{
+        const v = input.value.trim();
+        if(!v) return;
+        window.location = '/user-search?q=' + encodeURIComponent(v);
+      }); }
+
+      // click outside closes
+      document.addEventListener('click', (e)=>{ if(!results.contains(e.target) && e.target !== input) clearResults(); });
+    })();
+  </script>
+</body>
+</html>

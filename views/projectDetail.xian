@@ -1,0 +1,91 @@
+{{> head}}
+<body class="bg-white">
+  <div class="container mx-auto px-6 py-10">
+    <div class="max-w-4xl mx-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold">Project: {{job.title}}</h2>
+        <div class="text-sm text-gray-600">Status: <span class="font-semibold">{{job.status}}</span></div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="col-span-2">
+          <div class="bg-white border rounded-lg p-4 shadow-sm">
+            <h3 class="font-semibold text-lg">Booking Details</h3>
+            <div class="mt-3 text-sm text-gray-700">
+              <p><strong>Title:</strong> {{job.title}}</p>
+              <p><strong>Description:</strong> {{job.description}}</p>
+              {{#if job.budget}}<p><strong>Budget:</strong> {{job.currency}} {{job.budget}}</p>{{/if}}
+              {{#if job.deadline}}<p><strong>Deadline:</strong> {{job.deadline}}</p>{{/if}}
+              <p class="mt-2 text-xs text-gray-500">Posted by you on {{job.createdAt}}</p>
+            </div>
+
+            <div class="mt-6">
+              <h4 class="font-semibold">Project Actions</h4>
+              <div class="flex gap-3 mt-3">
+                {{#ifEquals job.status 'ongoing'}}
+                  <form method="POST" action="/projects/{{job.id}}/complete">
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded">Mark as Completed</button>
+                  </form>
+                {{/ifEquals}}
+
+                {{#unlessEquals job.status 'completed'}}
+                  <form method="POST" action="/projects/{{job.id}}/cancel" onsubmit="return confirm('Cancel this project booking? This will notify the freelancer.')">
+                    <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded">Cancel Booking</button>
+                  </form>
+                {{/unlessEquals}}
+
+                <a href="/messages?with={{freelancer.id}}&jobId={{job.id}}" class="px-4 py-2 bg-blue-600 text-white rounded">Message Freelancer</a>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="mt-6 bg-white border rounded-lg p-4 shadow-sm">
+            <h3 class="font-semibold text-lg">Tasks & Milestones</h3>
+            <p class="text-sm text-gray-500 mt-2">No task tracking is implemented yet. You can manage milestones via messages or upgrade to use the built-in task module.</p>
+          </div>
+
+        </div>
+
+        <div>
+          <div class="bg-white border rounded-lg p-4 shadow-sm">
+            <h3 class="font-semibold">Assigned Freelancer</h3>
+            {{#if freelancer}}
+              <div class="mt-3">
+                <div class="flex items-center gap-3">
+                  {{#if freelancerProfile.avatar}}
+                    <div class="w-12 h-12 rounded-full overflow-hidden">
+                      <img src="/uploads/{{freelancerProfile.avatar}}" alt="avatar" class="w-full h-full object-cover" />
+                    </div>
+                  {{else}}
+                    <div class="w-12 h-12 rounded-full bg-yellow-500 text-white flex items-center justify-center font-bold">{{freelancer.name.[0]}}</div>
+                  {{/if}}
+                  <div>
+                    <div class="font-semibold">{{freelancer.name}}</div>
+                    <div class="text-sm text-gray-500">{{freelancer.email}}</div>
+                  </div>
+                </div>
+
+                <div class="mt-3 text-sm">
+                  <p><strong>Date Booked:</strong> {{booking.createdAt}}</p>
+                  <p><strong>Proposal:</strong> {{booking.message}}</p>
+                </div>
+
+                <div class="mt-3">
+                  <a href="/profile/{{freelancer.id}}" class="text-sm text-red-600 hover:underline">View Freelancer Profile</a>
+                </div>
+              </div>
+            {{else}}
+              <div class="mt-3 text-sm text-gray-600">No freelancer assigned yet.</div>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <a href="/dashboard" class="text-sm text-red-600 hover:underline">Back to dashboard</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

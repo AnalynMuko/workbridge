@@ -1,0 +1,28 @@
+<html>
+  <head>
+    {{> head }}
+    <title>{{title}}</title>
+  </head>
+  <body>
+    <div class="container mx-auto mt-8">
+      <h1 class="text-2xl font-bold mb-4">Admin Login</h1>
+      {{#if error_msg}}
+        <div class="text-red-600">{{error_msg}}</div>
+      {{/if}}
+      <form method="POST" action="/admin/login">
+        <div class="mb-2">
+          <label class="block">Email</label>
+          <input name="email" class="border p-2 w-full" required />
+        </div>
+        <div class="mb-2">
+          <label class="block">Password</label>
+          <input name="password" type="password" class="border p-2 w-full" required />
+        </div>
+        <div>
+          <button class="bg-blue-600 text-white px-4 py-2 rounded">Sign in</button>
+        </div>
+      </form>
+    </div>
+    
+  </body>
+</html>

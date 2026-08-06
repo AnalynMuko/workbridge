@@ -1,0 +1,41 @@
+{{> head }}
+<body class="bg-gray-50">
+  <div class="container mx-auto px-6 py-10">
+    <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6">
+      <h2 class="text-2xl font-bold mb-4">Edit Job Post</h2>
+      <form method="POST" action="/browse/post/{{job.id}}/edit" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Job Title</label>
+          <input name="jobTitle" value="{{job.title}}" required class="w-full px-3 py-2 border border-gray-200 rounded-lg" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Position</label>
+          <input name="position" value="{{job.position}}" class="w-full px-3 py-2 border border-gray-200 rounded-lg" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Category</label>
+          <input name="jobCategory" value="{{job.category}}" class="w-full px-3 py-2 border border-gray-200 rounded-lg" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Budget</label>
+          <input name="budget" value="{{job.budget}}" class="w-full px-3 py-2 border border-gray-200 rounded-lg" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Description</label>
+          <textarea name="jobDescription" rows="5" class="w-full px-3 py-2 border border-gray-200 rounded-lg">{{job.description}}</textarea>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Requirements (one per line)</label>
+          <textarea name="requirements" rows="3" class="w-full px-3 py-2 border border-gray-200 rounded-lg">{{#if job.requirements}}{{{job.requirements}}}{{/if}}</textarea>
+          <p class="text-xs text-gray-500 mt-1">List documents or qualifications applicants must provide, one per line.</p>
+        </div>
+        <div class="flex justify-between items-center">
+          <a href="/browse" class="text-gray-600 hover:underline">Cancel</a>
+          <button type="submit" class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-red-600 text-white rounded-lg">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+</body>
+</html>

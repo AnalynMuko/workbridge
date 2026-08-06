@@ -1,0 +1,560 @@
+{{> head }}
+<body class="bg-gray-50">
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-50 bg-white shadow-md">
+    <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+      <!-- Left: Logo -->
+      <div class="flex-shrink-0">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-red-600 bg-clip-text text-transparent">
+          WorkBridge
+        </h1>
+      </div>
+
+      <!-- Middle: Navigation Links -->
+      <div class="hidden md:flex gap-8 flex-1 justify-center">
+        <a href="/dashboard" class="text-gray-700 hover:text-red-600 font-medium transition">Dashboard</a>
+        <a href="/browse" class="text-gray-700 hover:text-red-600 font-medium transition">Browse Jobs</a>
+        <a href="/profile" class="text-gray-700 hover:text-red-600 font-medium transition">Profile</a>
+      </div>
+
+      <!-- Right: Logout Button -->
+      <div class="flex-shrink-0">
+        <a href="/logout" class="bg-gradient-to-r from-yellow-500 to-red-600 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg transition">
+          Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto px-6 py-8">
+    <div class="grid lg:grid-cols-4 gap-6">
+      <!-- Messages List Sidebar -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+          <div class="p-4 border-b border-gray-200">
+            <h2 class="text-xl font-bold text-gray-900">Messages</h2>
+          </div>
+
+          <!-- Search Messages -->
+          <div class="p-4 border-b border-gray-200">
+            <input 
+              type="text" 
+              placeholder="Search conversations..." 
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-600"
+            />
+          </div>
+
+          <!-- Conversations List -->
+          <div class="divide-y divide-gray-200 max-h-[600px] overflow-y-auto">
+            {{#if conversations}}
+              {{#each conversations}}
+                <a href="/messages?with={{otherId}}" class="block p-4 hover:bg-gray-50 cursor-pointer {{#ifEquals ../selectedUser.id otherId}}bg-red-50 border-l-4 border-red-600{{/ifEquals}}">
+                  <div class="flex items-start gap-3">
+                    <div>
+                      {{#if otherAvatar}}
+                        <img src="/uploads/{{otherAvatar}}" alt="avatar" class="w-10 h-10 rounded-full object-cover" />
+                      {{else}}
+                        <div class="w-10 h-10 bg-gradient-to-r from-yellow-500 to-red-600 rounded-full flex items-center justify-center text-white font-bold">{{otherName.[0]}}</div>
+                      {{/if}}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="font-semibold text-gray-900">{{otherName}}</p>
+                      <p class="text-sm text-gray-600 truncate">{{lastMessage}}</p>
+                      <p class="text-xs text-gray-500 mt-1">{{lastAt}}</p>
+                    </div>
+                  </div>
+                </a>
+              {{/each}}
+            {{else}}
+              <div class="p-4 text-sm text-gray-600">No conversations yet.</div>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Area -->
+      <div class="lg:col-span-3">
+        <div id="chatArea" data-selected-user-id="{{#if selectedUser}}{{selectedUser.id}}{{/if}}" data-selected-user-name="{{#if selectedUser}}{{selectedUser.name}}{{/if}}" data-selected-user-email="{{#if selectedUser}}{{selectedUser.email}}{{/if}}" data-selected-user-avatar="{{#if selectedUser}}{{profile.avatar}}{{/if}}" data-job-id="{{jobId}}" data-current-user-id="{{currentUserId}}" class="bg-white rounded-xl shadow-md h-[700px] flex flex-col">
+          <!-- Chat Header -->
+          <div class="border-b border-gray-200 p-6 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-gradient-to-r from-yellow-500 to-red-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                {{#if selectedUser}}{{selectedUser.name}}{{else}}JD{{/if}}
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-gray-900">{{#if selectedUser}}{{selectedUser.name}}{{else}}John Doe{{/if}}</h3>
+                <p class="text-sm text-gray-600">{{#if jobTitle}}Discussing: {{jobTitle}}{{else}}Active 2 minutes ago{{/if}}</p>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <button id="startAudioRec" title="Record audio message" class="p-2 hover:bg-gray-100 rounded-lg transition">🔴</button>
+              <button id="startVideoCall" title="Start video call" class="p-2 hover:bg-gray-100 rounded-lg transition">📹</button>
+              <button id="openInfoBtn" class="p-2 hover:bg-gray-100 rounded-lg transition" title="Conversation info">ℹ️</button>
+            </div>
+          </div>
+
+          <!-- Messages Container -->
+          <div class="flex-1 overflow-y-auto p-6 space-y-4">
+            {{#if messages}}
+              {{#each messages}}
+                {{#ifEquals this.fromUserId ../currentUserId}}
+                  <!-- Outgoing Message -->
+                  <div class="flex items-end justify-end gap-3">
+                    <div class="max-w-xs">
+                      <div class="bg-gradient-to-r from-yellow-500 to-red-600 text-white px-4 py-2 rounded-lg rounded-br-none">{{content}}</div>
+                      {{#if this.media}}
+                        {{#if (contains this.mediaType 'audio')}}
+                          <audio class="mt-2" controls src="/uploads/{{this.media}}"></audio>
+                        {{else}}
+                          {{#if (contains this.mediaType 'image')}}
+                            <img class="mt-2 rounded max-w-xs" src="/uploads/{{this.media}}" alt="attachment" />
+                          {{else}}
+                            <div class="mt-2">
+                              <a class="text-sm text-blue-600" href="/uploads/{{this.media}}" target="_blank" rel="noopener noreferrer" download>Download attachment · {{this.media}}</a>
+                            </div>
+                          {{/if}}
+                        {{/if}}
+                      {{/if}}
+                      <p class="text-xs text-gray-500 mt-1 text-right">{{createdAt}}</p>
+                    </div>
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">You</div>
+                  </div>
+                {{else}}
+                  <!-- Incoming Message -->
+                  <div class="flex items-end gap-3">
+                    <div class="w-8 h-8 bg-gradient-to-r from-yellow-500 to-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                      {{#if selectedUser}}{{selectedUser.name.[0]}}{{else}}JD{{/if}}
+                    </div>
+                    <div class="max-w-xs">
+                      <div class="bg-gray-100 text-gray-900 px-4 py-2 rounded-lg rounded-bl-none">{{content}}</div>
+                      {{#if this.media}}
+                        {{#if (contains this.mediaType 'audio')}}
+                          <audio class="mt-2" controls src="/uploads/{{this.media}}"></audio>
+                        {{else}}
+                          {{#if (contains this.mediaType 'image')}}
+                            <img class="mt-2 rounded max-w-xs" src="/uploads/{{this.media}}" alt="attachment" />
+                          {{else}}
+                            <div class="mt-2">
+                              <a class="text-sm text-blue-600" href="/uploads/{{this.media}}" target="_blank" rel="noopener noreferrer" download>Download attachment · {{this.media}}</a>
+                            </div>
+                          {{/if}}
+                        {{/if}}
+                      {{/if}}
+                      <p class="text-xs text-gray-500 mt-1">{{createdAt}}</p>
+                    </div>
+                  </div>
+                {{/ifEquals}}
+              {{/each}}
+            {{else}}
+              <div class="text-center text-sm text-gray-500">No messages yet. Send the first message.</div>
+            {{/if}}
+          </div>
+
+          <!-- Message Input -->
+          {{#if selectedUser}}
+            {{#if jobId}}
+              <div class="p-4 border-t border-gray-200 bg-gray-50">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="text-sm text-gray-600">Applying for:</div>
+                    <div class="font-semibold text-gray-900">{{jobTitle}}</div>
+                    <a href="/jobs/{{jobId}}" class="text-xs text-blue-600">View job post</a>
+                  </div>
+                  <div>
+                    <form id="quickApplyForm" method="POST" action="/conversations/{{selectedUser.id}}/send">
+                      <input type="hidden" name="jobId" value="{{jobId}}" />
+                      <input type="hidden" name="content" value="Hi — I'm interested in applying for '{{jobTitle}}'. Please check my profile and let me know next steps." />
+                      <button type="submit" class="px-3 py-2 bg-green-600 text-white rounded-lg text-sm">Quick Apply</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            {{/if}}
+            <form id="textSendForm" method="POST" action="/conversations/{{selectedUser.id}}/send" class="border-t border-gray-200 p-4" enctype="multipart/form-data">
+              <div class="flex gap-3">
+                <input 
+                  name="content"
+                  type="text" 
+                  placeholder="{{#if jobTitle}}Message about: {{jobTitle}}{{else}}Type your message...{{/if}}" 
+                  class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-600"
+                />
+                {{#if jobId}}<input type="hidden" name="jobId" value="{{jobId}}" />{{/if}}
+                <!-- Allow audio and common document types (pdf, docx, xlsx, pptx, txt) and images -->
+                <input id="mediaInput" type="file" name="media" accept="audio/*,application/pdf,.pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.doc,.docx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xls,.xlsx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,.ppt,.pptx,text/plain,.txt,image/*" class="hidden" />
+                <button type="button" id="attachBtn" class="p-2 hover:bg-gray-100 rounded-lg transition" title="Attach file">📎</button>
+                <span id="attachedFilename" class="text-sm text-gray-600 ml-2"></span>
+                <button type="submit" class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-red-600 text-white rounded-lg font-semibold hover:shadow-lg transition">Send</button>
+              </div>
+            </form>
+
+            <!-- Audio Recorder UI (hidden until used) -->
+            <div id="recorderUI" class="hidden border-t border-gray-200 p-4">
+              <div class="flex items-center gap-3">
+                <button id="recRecord" class="px-3 py-2 bg-red-600 text-white rounded">Record</button>
+                <button id="recStop" class="px-3 py-2 bg-gray-200 rounded">Stop</button>
+                <button id="recCancel" class="px-3 py-2 bg-gray-200 rounded">Cancel</button>
+                <span id="recStatus" class="text-sm text-gray-600">Not recording</span>
+              </div>
+            </div>
+          {{else}}
+            <div class="border-t border-gray-200 p-4 text-center text-sm text-gray-500">Select a conversation to send messages.</div>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+</body>
+</html>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+// Audio recorder and video call client logic
+(function(){
+  const chat = document.getElementById('chatArea');
+  if (!chat) return;
+  const selectedUserId = chat.dataset.selectedUserId || null;
+  const currentUserId = chat.dataset.currentUserId || null;
+  const jobId = chat.dataset.jobId || '';
+
+  // set up a persistent signaling socket so pages can receive incoming call events
+  let signalingSocket = null;
+  if (typeof io !== 'undefined') {
+    try {
+      signalingSocket = io();
+      if (currentUserId) signalingSocket.emit('register', { userId: currentUserId });
+      // incoming call handler (show accept/decline banner)
+      signalingSocket.on('incoming-call', (payload) => {
+        try {
+          if (!payload || !payload.fromUserId) return;
+          // simple incoming banner
+          const banner = document.createElement('div');
+          banner.className = 'fixed top-6 right-6 bg-white border p-4 rounded shadow-lg z-60';
+          banner.innerHTML = `
+            <div class="font-semibold">Incoming call</div>
+            <div class="text-sm text-gray-600 mt-1">From user: ${payload.fromUserId}</div>
+            <div class="mt-3 flex gap-2">
+              <button id="acceptCallBtn" class="px-3 py-1 bg-green-600 text-white rounded">Accept</button>
+              <button id="declineCallBtn" class="px-3 py-1 bg-gray-200 rounded">Decline</button>
+            </div>`;
+          document.body.appendChild(banner);
+
+          const cleanup = ()=>{ try{ banner.remove(); }catch(e){} };
+
+          document.getElementById('declineCallBtn').addEventListener('click', ()=>{
+            cleanup();
+            // notify caller we declined
+            signalingSocket.emit('call-end', { fromUserId: currentUserId, toUserId: payload.fromUserId, room: payload.room });
+          });
+
+          document.getElementById('acceptCallBtn').addEventListener('click', async ()=>{
+            cleanup();
+            // open call modal and prepare local preview
+            const modal = document.createElement('div'); modal.className='fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50';
+            modal.innerHTML = `
+              <div class="bg-white rounded-lg p-4 w-full max-w-3xl">
+                <div class="flex justify-between items-center mb-2">
+                  <h3 class="font-bold">Incoming Call</h3>
+                  <button id="endIncomingCall" class="text-gray-600">✕</button>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <video id="localVideo" autoplay muted playsinline class="w-full bg-black rounded"></video>
+                    <div class="text-xs text-gray-500 mt-1">You</div>
+                  </div>
+                  <div>
+                    <video id="remoteVideo" autoplay playsinline class="w-full bg-black rounded"></video>
+                    <div class="text-xs text-gray-500 mt-1">Remote</div>
+                  </div>
+                </div>
+                <div class="mt-3 text-sm text-gray-600" id="callStatus">Connecting...</div>
+              </div>`;
+            document.body.appendChild(modal);
+
+            document.getElementById('endIncomingCall').addEventListener('click', ()=>{ try{ modal.remove(); }catch(e){} signalingSocket.emit('call-end', { fromUserId: currentUserId, toUserId: payload.fromUserId, room: payload.room }); });
+
+            // request local media and then accept via signaling
+            try{
+              let pc = null;
+              let remoteStream = null;
+              const localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+              const lv = document.getElementById('localVideo'); if (lv) lv.srcObject = localStream;
+              const statusEl = document.getElementById('callStatus'); if (statusEl) statusEl.textContent = 'Connected (waiting for offer)';
+
+              // handlers for incoming offer/answer/ice for callee
+              const onOffer = async (sdp) => {
+                try{
+                  if (!pc) {
+                    pc = new RTCPeerConnection();
+                    remoteStream = new MediaStream();
+                    const rv = document.getElementById('remoteVideo'); if (rv) rv.srcObject = remoteStream;
+                    pc.ontrack = (e)=>{ try{ e.streams[0].getTracks().forEach(t=>remoteStream.addTrack(t)); }catch(e){ e.track && remoteStream.addTrack(e.track); } };
+                    pc.onicecandidate = (e)=>{ if (e.candidate) signalingSocket.emit('ice-candidate', { room: payload.room, candidate: e.candidate }); };
+                  }
+                  await pc.setRemoteDescription(new RTCSessionDescription(sdp));
+                  // add local tracks
+                  if (localStream) localStream.getTracks().forEach(t=>pc.addTrack(t, localStream));
+                  const answer = await pc.createAnswer();
+                  await pc.setLocalDescription(answer);
+                  signalingSocket.emit('answer', { room: payload.room, sdp: pc.localDescription });
+                  if (statusEl) statusEl.textContent = 'Call established.';
+                }catch(err){ console.error('callee onOffer error', err); if (statusEl) statusEl.textContent = 'Error answering call'; }
+              };
+              const onIce = async (cand) => { try{ if (!pc) return; await pc.addIceCandidate(cand); }catch(e){ console.warn('callee ICE add failed', e); } };
+
+              signalingSocket.on('offer', onOffer);
+              signalingSocket.on('ice-candidate', onIce);
+
+              // tell server we accept the call
+              signalingSocket.emit('call-accept', { fromUserId: payload.fromUserId, room: payload.room });
+              // join the room so peer-joined triggers
+              signalingSocket.emit('join-call', payload.room);
+
+              // cleanup when closing
+              document.getElementById('endIncomingCall').addEventListener('click', ()=>{
+                try{ if (pc) pc.close(); }catch(e){}
+                try{ if (localStream) localStream.getTracks().forEach(t=>t.stop()); }catch(e){}
+                try{ signalingSocket.off('offer', onOffer); signalingSocket.off('ice-candidate', onIce); }catch(e){}
+                try{ modal.remove(); }catch(e){}
+                signalingSocket.emit('call-end', { fromUserId: currentUserId, toUserId: payload.fromUserId, room: payload.room });
+              });
+            }catch(err){ console.error('incoming accept media error', err); alert('Unable to access camera/microphone'); try{ modal.remove(); }catch(e){} }
+          });
+        } catch (err) { console.error('incoming-call handler error', err); }
+      });
+    } catch (e) {
+      console.warn('Signaling socket init failed', e);
+      signalingSocket = null;
+    }
+  }
+
+  // Audio Recorder
+  const startRecBtn = document.getElementById('startAudioRec');
+  const recorderUI = document.getElementById('recorderUI');
+  const recRecord = document.getElementById('recRecord');
+  const recStop = document.getElementById('recStop');
+  const recCancel = document.getElementById('recCancel');
+  const recStatus = document.getElementById('recStatus');
+  const mediaInput = document.getElementById('mediaInput');
+  const attachBtn = document.getElementById('attachBtn');
+
+  let mediaRecorder, audioChunks = [];
+  function supportsMedia(){return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);} 
+  if (startRecBtn && supportsMedia()){
+    startRecBtn.addEventListener('click', ()=>{ recorderUI.classList.remove('hidden'); recStatus.textContent='Ready to record'; });
+    attachBtn && attachBtn.addEventListener('click', ()=> mediaInput.click());
+
+    recRecord && recRecord.addEventListener('click', async ()=>{
+      try{
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+        mediaRecorder.onstop = async ()=>{
+          const blob = new Blob(audioChunks, { type: 'audio/webm' });
+          const fd = new FormData();
+          fd.append('media', blob, `voice-${Date.now()}.webm`);
+          fd.append('content','');
+          if (!selectedUserId) return alert('Select a conversation first');
+          const res = await fetch(`/conversations/${selectedUserId}/send`, { method: 'POST', body: fd });
+          if (res.redirected) window.location.href = res.url; else window.location.reload();
+        };
+        mediaRecorder.start(); recStatus.textContent='Recording...';
+      }catch(err){console.error(err); alert('Unable to access microphone');}
+    });
+
+    recStop && recStop.addEventListener('click', ()=>{ if (mediaRecorder && mediaRecorder.state!=='inactive') mediaRecorder.stop(); recStatus.textContent='Stopped'; });
+    recCancel && recCancel.addEventListener('click', ()=>{ recorderUI.classList.add('hidden'); recStatus.textContent='Not recording'; if (mediaRecorder && mediaRecorder.state!=='inactive') mediaRecorder.stop(); });
+    mediaInput && mediaInput.addEventListener('change', ()=>{ 
+      const form = document.getElementById('textSendForm'); 
+      const nameEl = document.getElementById('attachedFilename');
+      if (mediaInput.files && mediaInput.files.length > 0) {
+        const f = mediaInput.files[0];
+        if (nameEl) nameEl.textContent = f.name;
+      } else {
+        if (nameEl) nameEl.textContent = '';
+      }
+      if (form) form.submit(); 
+    });
+  }
+
+  // Video Call (WebRTC + Socket.IO signaling)
+  const startVideoBtn = document.getElementById('startVideoCall');
+  if (startVideoBtn){
+    startVideoBtn.addEventListener('click', async ()=>{
+      if (!selectedUserId || !currentUserId) return alert('Select a conversation to start a call');
+      // create modal with controls
+      const modal = document.createElement('div'); modal.className='fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50';
+      modal.innerHTML = `
+        <div class="bg-white rounded-lg p-4 w-full max-w-3xl">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-bold">Video Call</h3>
+            <div class="flex items-center gap-2">
+              <button id="muteBtn" class="px-3 py-1 bg-gray-200 rounded">Mute</button>
+              <button id="camBtn" class="px-3 py-1 bg-gray-200 rounded">Camera Off</button>
+              <button id="endCall" class="px-3 py-1 bg-red-600 text-white rounded">End</button>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <video id="localVideo" autoplay muted playsinline class="w-full bg-black rounded"></video>
+              <div class="text-xs text-gray-500 mt-1">You</div>
+            </div>
+            <div>
+              <video id="remoteVideo" autoplay playsinline class="w-full bg-black rounded"></video>
+              <div class="text-xs text-gray-500 mt-1">Remote</div>
+            </div>
+          </div>
+          <div class="mt-3 text-sm text-gray-600" id="callStatus">Initializing...</div>
+        </div>`;
+      document.body.appendChild(modal);
+
+      const muteBtn = document.getElementById('muteBtn');
+      const camBtn = document.getElementById('camBtn');
+      const endBtn = document.getElementById('endCall');
+      const statusEl = document.getElementById('callStatus');
+
+      let socket=null, pc=null, localStream=null, remoteStream=null;
+      let audioEnabled = true, videoEnabled = true;
+      const room = `call-${Math.min(Number(currentUserId),Number(selectedUserId))}-${Math.max(Number(currentUserId),Number(selectedUserId))}`;
+
+      // Cleanup function removes local media and event listeners attached for this modal
+      function endAndCleanup(){
+        try{ if (pc) { pc.close(); pc=null; } }catch(e){}
+        try{ if (localStream) { localStream.getTracks().forEach(t=>t.stop()); localStream=null; } }catch(e){}
+        // remove event listeners attached to the global signaling socket for this session
+        try{ if (socket && onCallAccepted) socket.off('call-accepted', onCallAccepted); }catch(e){}
+        try{ if (socket && onPeerJoined) socket.off('peer-joined', onPeerJoined); }catch(e){}
+        try{ if (socket && onOffer) socket.off('offer', onOffer); }catch(e){}
+        try{ if (socket && onAnswer) socket.off('answer', onAnswer); }catch(e){}
+        try{ if (socket && onIce) socket.off('ice-candidate', onIce); }catch(e){}
+        try{ modal.remove(); }catch(e){}
+        try{ if (signalingSocket) signalingSocket.emit('call-end', { fromUserId: currentUserId, toUserId: selectedUserId, room }); }catch(e){}
+      }
+
+      endBtn.addEventListener('click', ()=>{ endAndCleanup(); });
+
+      // helper to update buttons
+      function updateButtons(){ muteBtn.textContent = audioEnabled ? 'Mute' : 'Unmute'; camBtn.textContent = videoEnabled ? 'Camera Off' : 'Camera On'; }
+
+      muteBtn.addEventListener('click', ()=>{ if(!localStream) return; audioEnabled = !audioEnabled; localStream.getAudioTracks().forEach(t=>t.enabled = audioEnabled); updateButtons(); });
+      camBtn.addEventListener('click', ()=>{ if(!localStream) return; videoEnabled = !videoEnabled; localStream.getVideoTracks().forEach(t=>t.enabled = videoEnabled); updateButtons(); });
+
+      // request local media immediately to show preview and improve permission flow
+      if (!supportsMedia()){
+        alert('Your browser does not support camera/microphone access.');
+        modal.remove();
+        return;
+      }
+
+      try{
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        const lv = document.getElementById('localVideo'); if (lv) lv.srcObject = localStream;
+        audioEnabled = true; videoEnabled = true; updateButtons();
+        statusEl.textContent = 'Local preview ready.';
+      }catch(err){ console.error('Local media error', err); alert('Unable to access camera/microphone. Check permissions.'); modal.remove(); return; }
+
+      // if signaling socket isn't available, keep local preview and inform user
+      if (!signalingSocket) {
+        statusEl.textContent = 'Signaling not available — local preview only.';
+        return;
+      }
+
+      // use the page-wide signaling socket
+      socket = signalingSocket;
+      socket.emit('call-request', { toUserId: selectedUserId, fromUserId: currentUserId, room });
+      statusEl.textContent = 'Ringing...';
+
+      // register handlers and keep references so we can remove them later
+      const onCallAccepted = async (payload) => {
+        try{
+          if (!payload || payload.room !== room) return;
+          statusEl.textContent = 'Call accepted — joining...';
+          // join the server-side room so peer-joined events work
+          socket.emit('join-call', room);
+        }catch(e){ console.error('call-accepted handler error', e); }
+      };
+      const onPeerJoined = async () => { statusEl.textContent = 'Peer joined — starting call...'; if (!pc) await createPeerConnection(); await startLocalStreamAndOffer(); };
+      const onOffer = async (sdp) => {
+        try{
+          if (!pc) await createPeerConnection();
+          statusEl.textContent = 'Received offer — answering...';
+          await pc.setRemoteDescription(new RTCSessionDescription(sdp));
+          if (localStream && pc.getSenders && pc.getSenders().length === 0){ localStream.getTracks().forEach(t=>pc.addTrack(t, localStream)); }
+          const answer = await pc.createAnswer();
+          await pc.setLocalDescription(answer);
+          socket.emit('answer', { room, sdp: pc.localDescription });
+          statusEl.textContent = 'Call established.';
+        }catch(err){ console.error('Error handling offer', err); statusEl.textContent = 'Error handling offer'; }
+      };
+      const onAnswer = async (sdp) => { try{ if (!pc) return; await pc.setRemoteDescription(new RTCSessionDescription(sdp)); statusEl.textContent = 'Call established.'; }catch(err){ console.error('Error setting remote answer', err); statusEl.textContent = 'Error setting remote answer'; }};
+      const onIce = async (cand) => { try{ if (!pc) return; await pc.addIceCandidate(cand); }catch(e){ console.warn('ICE add failed',e); } };
+
+      socket.on('call-accepted', onCallAccepted);
+      socket.on('peer-joined', onPeerJoined);
+      socket.on('offer', onOffer);
+      socket.on('answer', onAnswer);
+      socket.on('ice-candidate', onIce);
+
+      async function createPeerConnection(){ pc = new RTCPeerConnection(); remoteStream = new MediaStream(); const rv = document.getElementById('remoteVideo'); if(rv) rv.srcObject = remoteStream; pc.ontrack = (e)=>{ try{ e.streams[0].getTracks().forEach(t=>remoteStream.addTrack(t)); }catch(e){ e.track && remoteStream.addTrack(e.track); } }; pc.onicecandidate = (e)=>{ if (e.candidate && socket) socket.emit('ice-candidate', { room, candidate: e.candidate }); }; }
+
+      async function startLocalStreamAndOffer(){ await createPeerConnection(); try{ if (localStream && pc.getSenders && pc.getSenders().length === 0) localStream.getTracks().forEach(t=>pc.addTrack(t, localStream)); const offer = await pc.createOffer(); await pc.setLocalDescription(offer); if (socket) socket.emit('offer', { room, sdp: pc.localDescription }); }catch(err){ console.error(err); statusEl.textContent = 'Unable to start call'; alert('Unable to access camera/microphone or start call'); } }
+    });
+  }
+
+  // Conversation Info slide-over
+  const infoBtn = document.getElementById('openInfoBtn');
+  if (infoBtn) {
+    infoBtn.addEventListener('click', ()=>{
+      const chatEl = document.getElementById('chatArea');
+      if (!chatEl) return;
+      const uid = chatEl.dataset.selectedUserId;
+      const name = chatEl.dataset.selectedUserName || 'User';
+      const email = chatEl.dataset.selectedUserEmail || '';
+      const avatar = chatEl.dataset.selectedUserAvatar || null;
+      // slide-over element
+      const panel = document.createElement('div');
+      panel.className = 'fixed top-0 right-0 h-full w-full sm:w-96 bg-white shadow-xl z-50 transform transition-transform';
+      panel.innerHTML = `
+        <div class="p-4 border-b flex items-center justify-between">
+          <div class="font-semibold">Conversation Info</div>
+          <button id="closeInfo" class="text-gray-600">✕</button>
+        </div>
+        <div class="p-4">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">${ avatar ? `<img src="/uploads/${avatar}" class="w-full h-full object-cover"/>` : name.charAt(0) }</div>
+            <div>
+              <div class="font-semibold text-lg">${name}</div>
+              <div class="text-sm text-gray-600">${email}</div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <button id="infoMessageBtn" class="w-full px-4 py-2 bg-gradient-to-r from-yellow-500 to-red-600 text-white rounded mb-2">Message</button>
+            <button id="infoCallBtn" class="w-full px-4 py-2 border rounded mb-2">Start Call</button>
+            <a href="/profile/${uid}" class="block text-center text-sm text-blue-600">View Profile →</a>
+          </div>
+        </div>`;
+      document.body.appendChild(panel);
+      const closeBtn = document.getElementById('closeInfo');
+      closeBtn && closeBtn.addEventListener('click', ()=>{ try{ panel.remove(); }catch(e){} });
+
+      const msgBtn = document.getElementById('infoMessageBtn');
+      msgBtn && msgBtn.addEventListener('click', ()=>{
+        // focus message input
+        const input = document.querySelector('#textSendForm input[name="content"]');
+        if (input) { input.focus(); }
+        panel.remove();
+      });
+
+      const callBtn = document.getElementById('infoCallBtn');
+      callBtn && callBtn.addEventListener('click', ()=>{
+        // trigger existing startVideoBtn
+        if (startVideoBtn) startVideoBtn.click();
+        panel.remove();
+      });
+    });
+  }
+})();
+</script>

@@ -1,0 +1,212 @@
+{{> head }}
+<body class="bg-gray-50">
+  <nav class="sticky top-0 z-50 bg-white shadow-md">
+    <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex-shrink-0">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-red-600 bg-clip-text text-transparent">WorkBridge</h1>
+      </div>
+      <div class="hidden md:flex gap-8 flex-1 justify-center">
+        <a href="/dashboard" class="text-gray-700 hover:text-red-600 font-medium transition">Dashboard</a>
+        <a href="/browse" class="text-gray-700 hover:text-red-600 font-medium transition">Browse Jobs</a>
+        <a href="/profile" class="text-red-600 font-medium transition border-b-2 border-red-600">Profile</a>
+      </div>
+      <div class="flex-shrink-0">
+        <a href="/logout" class="bg-gradient-to-r from-yellow-500 to-red-600 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg transition">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mx-auto px-6 py-8">
+    <div class="grid lg:grid-cols-3 gap-8">
+      <!-- Profile card -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="h-28 bg-gradient-to-r from-yellow-400 to-red-500"></div>
+        <div class="p-6">
+          <div class="-mt-16 flex items-center gap-6">
+            <div class="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden bg-white">
+              {{#if profile.avatar}}
+                <img id="profileAvatarImg" src="/uploads/{{profile.avatar}}" alt="avatar" class="w-full h-full object-cover" />
+              {{else}}
+                <div id="profileAvatarImg" class="w-full h-full flex items-center justify-center bg-gradient-to-r from-yellow-500 to-red-600 text-white text-3xl font-bold">{{user.name.[0]}}</div>
+              {{/if}}
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-3">
+                <h2 class="text-2xl font-bold text-gray-900">{{user.name}}</h2>
+                {{#if profile.verified}}
+                  <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Verified</span>
+                {{/if}}
+              </div>
+              <p class="text-sm text-gray-600">{{user.email}}</p>
+              {{#if profile}}
+                <p class="text-sm text-gray-700 mt-3">{{profile.bio}}</p>
+                <div class="mt-2 text-xs text-gray-500">Location: {{profile.address}}</div>
+              {{/if}}
+            </div>
+          </div>
+
+          <div class="mt-6 flex items-center gap-3">
+            {{#if currentUser}}
+              {{#ifEquals currentUser.id user.id}}
+                <a href="/profile-setup" class="px-4 py-2 bg-white border rounded text-sm">Edit Profile</a>
+              {{else}}
+                <a href="/messages?with={{user.id}}" class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-red-600 text-white rounded text-sm">Message</a>
+                <a href="/messages?with={{user.id}}&call=1" class="px-4 py-2 border rounded text-sm">Start Call</a>
+              {{/ifEquals}}
+            {{else}}
+              <a href="/login" class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-red-600 text-white rounded text-sm">Sign in to interact</a>
+            {{/if}}
+
+            <button id="shareProfileBtn" class="px-3 py-2 bg-gray-100 rounded text-sm">Share Profile</button>
+          </div>
+
+          <div class="mt-4">
+            {{#if profile.skills}}
+              <div class="flex flex-wrap gap-2"> 
+                {{#each (split profile.skills ',')}}
+                  <span class="text-xs bg-gray-100 text-gray-800 px-3 py-1 rounded">{{this}}</span>
+                {{/each}}
+              </div>
+            {{/if}}
+          </div>
+
+          <div class="mt-4 border-t pt-4 text-sm text-gray-600">
+            <strong>Stats:</strong> Posts: <strong>{{posts.length}}</strong> · Jobs: <strong>{{jobs.length}}</strong>
+          </div>
+
+          {{#if currentUser}}
+            {{#ifEquals currentUser.id user.id}}
+              <div class="mt-4">
+                <form id="avatarUploadForm" action="/profile/avatar" method="POST" enctype="multipart/form-data" class="flex items-center gap-2">
+                  <input id="avatarInput" type="file" name="avatar" accept="image/*" class="text-sm" />
+                  <button type="submit" class="px-3 py-1 bg-red-600 text-white rounded-lg text-sm">Upload</button>
+                </form>
+              </div>
+            {{/ifEquals}}
+          {{/if}}
+        </div>
+      </div>
+
+      <!-- Posts and Jobs -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+          <h3 class="text-xl font-bold mb-4">Recent Posts</h3>
+          {{#if posts.length}}
+            <div class="space-y-4">
+              {{#each posts}}
+                <div class="border border-gray-100 rounded-lg p-4">
+                  <div class="flex items-start justify-between">
+                    <p class="text-gray-800">{{content}}</p>
+                    <div class="text-xs text-gray-500">{{createdAt}}</div>
+                  </div>
+                  {{#if image}}<img src="/uploads/{{image}}" alt="post image" class="mt-3 rounded max-w-md" />{{/if}}
+                </div>
+              {{/each}}
+            </div>
+          {{else}}
+            <div class="text-center text-sm text-gray-500 py-10">No recent posts yet.</div>
+          {{/if}}
+        </div>
+
+        <!-- Portfolio Section (visible to all viewers) -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold">Portfolio</h3>
+                      {{#if currentUser}}
+                        {{#ifEquals currentUser.id user.id}}
+                          <a href="/portfolio" class="text-sm px-3 py-1 bg-red-600 text-white rounded">Manage Portfolio</a>
+                        {{else}}
+                          <a href="/profile/{{user.id}}/portfolio" class="text-sm px-3 py-1 border rounded">View Portfolio</a>
+                        {{/ifEquals}}
+                      {{/if}}
+          </div>
+          {{#if portfolios}}
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {{#each portfolios}}
+                <div class="border rounded p-3">
+                  <div class="h-28 bg-gray-100 rounded overflow-hidden flex items-center justify-center mb-2">
+                    {{#if this.files.length}}
+                      {{#ifEquals this.files.[0].mimetype 'application/pdf'}}
+                        <div class="text-xs text-gray-600">PDF</div>
+                      {{else}}
+                        <img src="/uploads/portfolio/{{this.files.[0].filename}}" class="w-full h-full object-cover" />
+                      {{/ifEquals}}
+                    {{else}}
+                      <div class="text-xs text-gray-400">No preview</div>
+                    {{/if}}
+                  </div>
+                  <div class="text-sm font-semibold">{{this.title}}</div>
+                  <div class="text-xs text-gray-500">{{this.category}}</div>
+                </div>
+              {{/each}}
+            </div>
+          {{else}}
+            <div class="text-sm text-gray-500">No portfolio projects yet.</div>
+          {{/if}}
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold mb-4">Job Listings</h3>
+          {{#if jobs.length}}
+            <div class="space-y-4">
+              {{#each jobs}}
+                <div class="border border-gray-100 rounded-lg p-4">
+                  <div class="flex items-start justify-between mb-2">
+                    <div>
+                      <h4 class="text-lg font-semibold text-gray-900">{{title}}</h4>
+                      <p class="text-sm text-gray-600">{{createdAt}}</p>
+                    </div>
+                    <span class="text-sm font-semibold {{#ifEquals status 'active'}}bg-green-100 text-green-800 px-3 py-1 rounded-full{{else}}bg-gray-100 text-gray-700 px-3 py-1 rounded-full{{/ifEquals}}">{{status}}</span>
+                  </div>
+                  <p class="text-gray-700">{{description}}</p>
+                  <div class="flex items-center justify-between mt-3">
+                    <div class="text-sm text-gray-600">💰 {{currency}} {{budget}}</div>
+                    <div>
+                      <a href="/jobs/{{id}}" class="text-red-600 font-semibold">View Details →</a>
+                    </div>
+                  </div>
+
+                  <!-- Portfolio removed from inside job card. Portfolio is rendered in its own section below. -->
+                </div>
+              {{/each}}
+            </div>
+          {{else}}
+            <div class="text-center text-sm text-gray-500 py-10">No job listings yet.</div>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+</body>
+</html>
+
+<script>
+  // Avatar preview before upload
+  (function(){
+    const avatarInput = document.getElementById('avatarInput');
+    const avatarImg = document.getElementById('profileAvatarImg');
+    if (avatarInput && avatarImg) {
+      avatarInput.addEventListener('change', (e)=>{
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = function(evt){
+          try{ avatarImg.tagName === 'IMG' ? avatarImg.src = evt.target.result : avatarImg.innerHTML = '<img src="'+evt.target.result+'" class="w-full h-full object-cover" />'; }catch(e){}
+        };
+        reader.readAsDataURL(f);
+      });
+    }
+
+    const shareBtn = document.getElementById('shareProfileBtn');
+    if (shareBtn){
+      shareBtn.addEventListener('click', ()=>{
+        try{
+          const url = window.location.href;
+          navigator.clipboard.writeText(url).then(()=>{ alert('Profile URL copied to clipboard'); }, ()=>{ prompt('Copy this URL', url); });
+        }catch(e){ prompt('Copy this URL', window.location.href); }
+      });
+    }
+  })();
+</script>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WorkBridge - Smart Freelance Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes blob {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(20px, -50px) scale(1.1); }
+      50% { transform: translate(-20px, 20px) scale(0.9); }
+      75% { transform: translate(50px, 50px) scale(1.05); }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes bounceSlow {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes gradient {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .animate-blob {
+      animation: blob 7s infinite;
+    }
+
+    .animate-fade-in-up {
+      animation: fadeInUp 0.8s ease-out forwards;
+      opacity: 0;
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 1s ease-out forwards;
+      opacity: 0;
+    }
+
+    .animate-bounce-slow {
+      animation: bounceSlow 3s ease-in-out infinite;
+    }
+
+    .animate-gradient {
+      background-size: 200% 200%;
+      animation: gradient 3s ease infinite;
+    }
+
+    .animation-delay-200 {
+      animation-delay: 0.2s;
+    }
+
+    .animation-delay-400 {
+      animation-delay: 0.4s;
+    }
+
+    .animation-delay-600 {
+      animation-delay: 0.6s;
+    }
+
+    .animation-delay-800 {
+      animation-delay: 0.8s;
+    }
+
+    .animation-delay-2000 {
+      animation-delay: 2s;
+    }
+
+    .animation-delay-4000 {
+      animation-delay: 4s;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body class="bg-white">
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100">
+    <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+      <!-- Left: Logo -->
+      <div class="flex-shrink-0">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-red-600 bg-clip-text text-transparent hover:scale-105 transition-transform cursor-pointer">
+          WorkBridge
+        </h1>
+      </div>
+
+      <!-- Middle: Navigation Links -->
+      <div class="hidden md:flex gap-8 flex-1 justify-center">
+        <a href="#home" class="text-gray-700 hover:text-red-600 font-medium transition-all relative group">
+          Home
+          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-600 transition-all group-hover:w-full"></span>
+        </a>
+        <a href="#about" class="text-gray-700 hover:text-red-600 font-medium transition-all relative group">
+          About
+          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-600 transition-all group-hover:w-full"></span>
+        </a>
+        <a href="#contact" class="text-gray-700 hover:text-red-600 font-medium transition-all relative group">
+          Contact
+          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-600 transition-all group-hover:w-full"></span>
+        </a>
+      </div>
+
+      <!-- Right: Login Button -->
+      <div class="flex-shrink-0">
+        <a href="/login" class="bg-gradient-to-r from-yellow-500 to-red-600 text-white px-6 py-2 rounded-lg font-medium hover:shadow-xl transition-all hover:scale-105">
+          Login
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="home" class="bg-gradient-to-br from-yellow-50 via-white to-red-50 py-24 overflow-hidden relative">
+    <!-- Animated Background Elements -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute top-20 left-10 w-72 h-72 bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+      <div class="absolute top-40 right-10 w-72 h-72 bg-red-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+      <div class="absolute -bottom-8 left-1/2 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+    </div>
+
+    <div class="container mx-auto px-6 relative">
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <!-- Left Content -->
+        <div class="space-y-6 animate-fade-in-up">
+          <h2 class="text-5xl md:text-6xl font-bold text-gray-900 leading-tight">
+            Smart Freelance <span class="bg-gradient-to-r from-yellow-500 to-red-600 bg-clip-text text-transparent animate-gradient">Booking & Tracking</span>
+          </h2>
+          <p class="text-xl text-gray-600 leading-relaxed">
+            Connect, Book, and Track Your Freelance Projects Effortlessly. WorkBridge is the platform that brings freelancers and clients together.
+          </p>
+          <div class="flex gap-4">
+            <a href="/register" class="bg-gradient-to-r from-yellow-500 to-red-600 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-2xl transition-all transform hover:scale-105 hover:-translate-y-1">
+              Get Started
+            </a>
+            <a href="#about" class="border-2 border-red-600 text-red-600 px-8 py-3 rounded-lg font-semibold hover:bg-red-600 hover:text-white transition-all transform hover:scale-105">
+              Learn More
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: Decorative Hero Image -->
+        <div class="hidden md:flex justify-center animate-fade-in">
+          <div class="relative group">
+            <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-red-500 rounded-3xl blur-2xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
+            <div class="relative w-80 h-80 bg-gradient-to-br from-yellow-400 to-red-500 rounded-3xl shadow-2xl flex items-center justify-center transform group-hover:scale-105 group-hover:rotate-2 transition-all duration-500">
+              <div class="text-center text-white">
+                <p class="text-6xl mb-4 animate-bounce-slow">💼</p>
+                <p class="text-2xl font-bold">WorkBridge</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-24 bg-white">
+    <div class="container mx-auto px-6">
+      <h3 class="text-4xl font-bold text-center text-gray-900 mb-4 animate-fade-in-up">Why Choose WorkBridge?</h3>
+      <p class="text-center text-gray-600 mb-16 text-lg animate-fade-in-up animation-delay-200">Everything you need to manage your freelance work efficiently</p>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Feature 1 -->
+        <div class="p-8 border border-gray-200 rounded-xl hover:shadow-2xl hover:border-yellow-300 transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up animation-delay-400 group bg-white">
+          <div class="text-4xl mb-4 transform group-hover:scale-110 transition-transform">🎯</div>
+          <h4 class="text-2xl font-bold text-gray-900 mb-3">Smart Booking</h4>
+          <p class="text-gray-600">
+            Find and book the perfect freelancer for your project with our advanced matching algorithm.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="p-8 border border-gray-200 rounded-xl hover:shadow-2xl hover:border-yellow-300 transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up animation-delay-600 group bg-white">
+          <div class="text-4xl mb-4 transform group-hover:scale-110 transition-transform">📊</div>
+          <h4 class="text-2xl font-bold text-gray-900 mb-3">Real-Time Tracking</h4>
+          <p class="text-gray-600">
+            Monitor your project progress in real-time with detailed analytics and status updates.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="p-8 border border-gray-200 rounded-xl hover:shadow-2xl hover:border-yellow-300 transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up animation-delay-800 group bg-white">
+          <div class="text-4xl mb-4 transform group-hover:scale-110 transition-transform">💳</div>
+          <h4 class="text-2xl font-bold text-gray-900 mb-3">Secure Payments</h4>
+          <p class="text-gray-600">
+            Safe and secure payment processing with escrow protection for both parties.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="bg-gradient-to-br from-yellow-50 via-white to-red-50 py-24 relative overflow-hidden">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
+      <div class="absolute -top-40 -right-40 w-96 h-96 bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl"></div>
+      <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-red-200 rounded-full mix-blend-multiply filter blur-3xl"></div>
+    </div>
+    
+    <div class="container mx-auto px-6 relative">
+      <div class="max-w-3xl mx-auto text-center">
+        <h3 class="text-4xl font-bold text-gray-900 mb-6 animate-fade-in-up">About WorkBridge</h3>
+        <p class="text-xl text-gray-700 mb-8 animate-fade-in-up animation-delay-200 leading-relaxed">
+          WorkBridge is revolutionizing the freelance industry by providing a seamless platform where businesses and professionals connect, collaborate, and thrive. Our mission is to bridge the gap between talent and opportunity.
+        </p>
+        <p class="text-lg text-gray-600 animate-fade-in-up animation-delay-400">
+          With over 10,000+ successful projects completed, we've built a community where quality work meets fair compensation. Join thousands of satisfied freelancers and clients today.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="bg-gradient-to-r from-yellow-500 to-red-600 py-20 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white to-transparent"></div>
+    </div>
+    <div class="container mx-auto px-6 text-center relative">
+      <h3 class="text-4xl font-bold text-white mb-6 animate-fade-in-up">Ready to Get Started?</h3>
+      <p class="text-xl text-yellow-50 mb-8 animate-fade-in-up animation-delay-200">Join WorkBridge today and transform the way you work</p>
+      <a href="/register" class="inline-block bg-white text-red-600 px-8 py-3 rounded-lg font-bold hover:shadow-2xl transition-all transform hover:scale-105 hover:-translate-y-1 animate-fade-in-up animation-delay-400">
+        Start Your Journey
+      </a>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="py-24 bg-white">
+    <div class="container mx-auto px-6">
+      <h3 class="text-4xl font-bold text-center text-gray-900 mb-16 animate-fade-in-up">Get In Touch</h3>
+      
+      <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+        <!-- Email -->
+        <div class="text-center p-6 rounded-xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up animation-delay-200 group">
+          <div class="text-4xl mb-4 transform group-hover:scale-110 transition-transform"></div>
+          <h4 class="text-xl font-bold text-gray-900 mb-2">Email</h4>
+          <p class="text-gray-600">support@workbridge.com</p>
+        </div>
+
+        <!-- Phone -->
+        <div class="text-center p-6 rounded-xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up animation-delay-400 group">
+          <div class="text-4xl mb-4 transform group-hover:scale-110 transition-transform"></div>
+          <h4 class="text-xl font-bold text-gray-900 mb-2">Phone</h4>
+          <p class="text-gray-600">+1 (555) 123-4567</p>
+        </div>
+
+        <!-- Address -->
+        <div class="text-center p-6 rounded-xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up animation-delay-600 group">
+          <div class="text-4xl mb-4 transform group-hover:scale-110 transition-transform"></div>
+          <h4 class="text-xl font-bold text-gray-900 mb-2">Address</h4>
+          <p class="text-gray-600">San Francisco, CA 94105</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-300 py-8">
+    <div class="container mx-auto px-6 text-center">
+      <p class="text-sm">&copy; 2024 WorkBridge. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>

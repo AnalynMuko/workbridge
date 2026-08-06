@@ -1,0 +1,69 @@
+{{> head}}
+<body class="bg-white">
+  <div class="container mx-auto px-6 py-10">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-2xl font-bold mb-4">My Proposals</h2>
+      <p class="text-sm text-gray-600 mb-6">Proposals you've submitted as a freelancer.</p>
+
+      {{#if proposals.length}}
+        <div class="space-y-4">
+          {{#each proposals}}
+            <div class="border rounded-lg p-4 bg-white shadow-sm">
+              <div class="flex justify-between items-start">
+                <div>
+                  <a href="/jobs/{{jobId}}" class="text-lg font-semibold text-red-600 hover:underline">{{jobTitle}}</a>
+                  <div class="text-sm text-gray-500">Submitted: {{this.createdAt}}</div>
+                </div>
+                <div class="text-sm">
+                  <span class="px-2 py-1 rounded text-white font-semibold {{#ifEquals status 'Accepted'}}bg-green-600{{else}}{{#ifEquals status 'Rejected'}}bg-gray-500{{else}}bg-yellow-500{{/ifEquals}}{{/ifEquals}}">{{status}}</span>
+                </div>
+              </div>
+
+              <div class="mt-3 text-gray-700">
+                {{#if message}}
+                  <p class="mb-2">{{message}}</p>
+                {{/if}}
+                <div class="flex gap-3 items-center text-sm text-gray-600">
+                  {{#if bid}}<div>Bid: <strong>₱{{bid}}</strong></div>{{/if}}
+                  {{#if deliveryDays}}<div>Delivery: <strong>{{deliveryDays}} days</strong></div>{{/if}}
+                </div>
+
+                {{#if files.length}}
+                  <div class="mt-3">
+                    <h4 class="text-sm font-medium text-gray-800">Attachments</h4>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                      {{#each files}}
+                        <a href="/uploads/proposals/{{this.filename}}" target="_blank" class="px-2 py-1 border rounded text-sm bg-gray-50">{{this.originalname}}</a>
+                      {{/each}}
+                    </div>
+                  </div>
+                {{/if}}
+                {{#if this.requirementFiles}}
+                  <div class="mt-3">
+                    <h4 class="text-sm font-medium text-gray-800">Requirement Documents</h4>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                      {{#each (jsonParse this.requirementFiles)}}
+                        <a href="/uploads/proposals/{{this.filename}}" target="_blank" class="px-2 py-1 border rounded text-sm bg-gray-50">{{this.originalname}}</a>
+                      {{/each}}
+                    </div>
+                  </div>
+                {{/if}}
+
+                {{#if jobStatus}}
+                  <div class="mt-3 text-xs text-gray-500">Job status: {{jobStatus}}</div>
+                {{/if}}
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="text-gray-600">You haven't submitted any proposals yet.</div>
+      {{/if}}
+
+      <div class="mt-8">
+        <a href="/dashboard" class="text-sm text-red-600 hover:underline">Back to dashboard</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>{{ title }} </title>
+</head>
+<script>
+  // Expose server-provided current user to client code
+  window.__CURRENT_USER = {{{currentUserJson}}};
+  // Expose profile (if present) so client can render avatar and other info
+  window.__CURRENT_PROFILE = {{{profileJson}}};
+
+  // When the page loads, replace the Logout link with a profile dropdown if user is present.
+  document.addEventListener('DOMContentLoaded', function () {
+    try {
+      const user = window.__CURRENT_USER || null;
+      if (!user) return;
+
+      // find existing logout anchor
+      const logoutAnchor = document.querySelector('a[href="/logout"]');
+      if (!logoutAnchor) return;
+
+      // build profile button element
+      const wrapper = document.createElement('div');
+      wrapper.className = 'relative';
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'flex items-center gap-3 px-4 py-2 rounded-lg hover:shadow-md bg-white';
+      // prefer profile avatar if available
+      const profile = window.__CURRENT_PROFILE || null;
+      if (profile && profile.avatar) {
+        btn.innerHTML = `
+          <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-white shadow-sm">
+            <img src="/uploads/${profile.avatar}" alt="avatar" class="w-full h-full object-cover" />
+          </div>
+          <span class="hidden sm:inline text-sm text-gray-700">${user.name}</span>
+        `;
+      } else {
+        btn.innerHTML = `
+          <div class="w-8 h-8 bg-gradient-to-r from-yellow-500 to-red-600 rounded-full flex items-center justify-center text-white font-bold">${(user.name||'U')[0].toUpperCase()}</div>
+          <span class="hidden sm:inline text-sm text-gray-700">${user.name}</span>
+        `;
+      }
+
+      const menu = document.createElement('div');
+      menu.className = 'absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg py-2 hidden z-50';
+      menu.innerHTML = `
+        <div class="px-4 py-3 border-b border-gray-100">
+          <p class="font-semibold text-gray-900">${user.name}</p>
+          <p class="text-xs text-gray-500">${user.email}</p>
+        </div>
+        <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">View Profile</a>
+        <a href="/profile-setup" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Edit Profile</a>
+        <a href="/messages" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Messages</a>
+        <a href="/logout" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-50">Logout</a>
+      `;
+
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        menu.classList.toggle('hidden');
+      });
+
+      // close menu on outside click
+      document.addEventListener('click', function () {
+        if (!menu.classList.contains('hidden')) menu.classList.add('hidden');
+      });
+
+      wrapper.appendChild(btn);
+      wrapper.appendChild(menu);
+
+      // replace logout anchor with wrapper
+      logoutAnchor.parentNode.replaceChild(wrapper, logoutAnchor);
+    } catch (err) {
+      console.error('Profile dropdown init error', err);
+    }
+  });
+
+      // Intercept any logout link clicks and ask for confirmation before navigating.
+      document.addEventListener('click', function (e) {
+        try {
+          const anchor = e.target.closest && e.target.closest('a[href="/logout"]');
+          if (!anchor) return;
+          e.preventDefault();
+          const ok = confirm('Are you sure you want to logout?');
+          if (ok) {
+            // If the link was inside a form or needs to be POSTed change accordingly.
+            window.location = anchor.href;
+          }
+        } catch (err) {
+          // ignore
+        }
+      });
+</script>

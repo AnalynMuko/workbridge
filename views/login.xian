@@ -1,0 +1,136 @@
+{{> head}}
+<body class="bg-white">
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-50 bg-white shadow-md">
+    <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+      <!-- Left: Logo -->
+      <div class="flex-shrink-0">
+        <a href="/" class="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-red-600 bg-clip-text text-transparent">
+          WorkBridge
+        </a>
+      </div>
+
+      <!-- Middle: Navigation Links -->
+      <div class="hidden md:flex gap-8 flex-1 justify-center">
+        <a href="/" class="text-gray-700 hover:text-red-600 font-medium transition">Home</a>
+        <a href="/#about" class="text-gray-700 hover:text-red-600 font-medium transition">About</a>
+        <a href="/#contact" class="text-gray-700 hover:text-red-600 font-medium transition">Contact</a>
+      </div>
+
+      <!-- Right: Register Button -->
+      <div class="flex-shrink-0">
+        <a href="/register" class="bg-gradient-to-r from-yellow-500 to-red-600 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg transition">
+          Register
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Login Section -->
+  <section class="bg-gradient-to-r from-yellow-50 via-yellow-100 to-red-50 min-h-screen flex items-center py-20">
+    <div class="container mx-auto px-6">
+      <div class="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
+        <!-- Left: Welcome Content -->
+        <div class="space-y-6 hidden md:block">
+          <h2 class="text-5xl font-bold text-gray-900 leading-tight">
+            Welcome Back to <span class="bg-gradient-to-r from-yellow-500 to-red-600 bg-clip-text text-transparent">WorkBridge</span>
+          </h2>
+          <p class="text-xl text-gray-700">
+            Access your freelance projects, track progress, and manage your workflow all in one place.
+          </p>
+          <div class="space-y-4 pt-6">
+            <div class="flex items-start gap-4">
+              <span class="text-3xl">📊</span>
+              <div>
+                <h4 class="text-lg font-bold text-gray-900">Real-Time Dashboard</h4>
+                <p class="text-gray-600">Monitor all your projects at a glance</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <span class="text-3xl">🔒</span>
+              <div>
+                <h4 class="text-lg font-bold text-gray-900">Secure Access</h4>
+                <p class="text-gray-600">Your data is protected with enterprise-grade security</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <span class="text-3xl">⚡</span>
+              <div>
+                <h4 class="text-lg font-bold text-gray-900">Instant Updates</h4>
+                <p class="text-gray-600">Get real-time notifications on your projects</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Login Form -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-10">
+          <h3 class="text-3xl font-bold text-gray-900 mb-2">Sign In</h3>
+          <p class="text-gray-600 mb-8">Enter your credentials to access your account</p>
+
+          <form method="POST" action="/login" class="space-y-6">
+            <!-- Email Input -->
+            <div>
+              <label for="email" class="block text-gray-700 font-semibold mb-2">Email Address</label>
+              <input 
+                type="email" 
+                id="email"
+                name="email" 
+                placeholder="you@example.com" 
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-red-600 transition"
+                required 
+              />
+            </div>
+
+            <!-- Password Input -->
+            <div>
+              <label for="password" class="block text-gray-700 font-semibold mb-2">Password</label>
+              <input 
+                type="password" 
+                id="password"
+                name="password" 
+                placeholder="••••••••" 
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-red-600 transition"
+                required 
+              />
+            </div>
+
+            <!-- Remember Me & Forgot Password -->
+            <div class="flex items-center justify-between">
+              <label class="flex items-center gap-2">
+                <input type="checkbox" name="remember" class="w-4 h-4 accent-red-600" />
+                <span class="text-gray-700">Remember me</span>
+              </label>
+              <a href="/forgotpassword" class="text-red-600 hover:text-red-700 font-medium transition">
+                Forgot password?
+              </a>
+            </div>
+
+            <!-- Login Button -->
+            <button 
+              type="submit" 
+              class="w-full bg-gradient-to-r from-yellow-500 to-red-600 text-white font-bold py-3 px-4 rounded-lg hover:shadow-lg transition transform hover:scale-105"
+            >
+              Sign In
+            </button>
+          </form>
+
+          <!-- Divider -->
+          <div class="flex items-center gap-4 my-8">
+            <div class="flex-1 h-px bg-gray-200"></div>
+            <span class="text-gray-500">or</span>
+            <div class="flex-1 h-px bg-gray-200"></div>
+          </div>
+
+          <!-- Register Link -->
+          <p class="text-center text-gray-700">
+            Don't have an account? 
+            <a href="/register" class="text-red-600 hover:text-red-700 font-bold transition">
+              Create one
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+ 

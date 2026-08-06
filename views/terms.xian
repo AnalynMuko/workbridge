@@ -1,0 +1,34 @@
+{{> head }}
+<body class="bg-white">
+  <nav class="sticky top-0 z-50 bg-white shadow-md">
+    <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex-shrink-0">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-red-600 bg-clip-text text-transparent">WorkBridge</h1>
+      </div>
+      <div class="flex gap-4">
+        <a href="/" class="text-gray-700 hover:text-red-600">Home</a>
+        <a href="/about" class="text-gray-700 hover:text-red-600">About</a>
+        <a href="/contact" class="text-gray-700 hover:text-red-600">Contact</a>
+        <a href="/login" class="bg-gradient-to-r from-yellow-500 to-red-600 text-white px-4 py-2 rounded-lg">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="py-20">
+    <div class="container mx-auto px-6">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-4xl font-bold text-gray-900 mb-6 text-center">Terms & Conditions</h2>
+        <p class="text-gray-600 mb-4">Welcome to WorkBridge. By using our platform you agree to the following terms and conditions.</p>
+        <ol class="list-decimal list-inside text-gray-600 space-y-2">
+          <li>Users must provide accurate information during registration and profile setup.</li>
+          <li>Profiles and listings must comply with our content guidelines.</li>
+          <li>WorkBridge is a platform — disputes between parties should be resolved directly or via our support team.</li>
+        </ol>
+        <p class="text-gray-600 mt-6">This page is a placeholder — update with full legal terms before production.</p>
+      </div>
+    </div>
+  </main>
+
+  
+
+</body>

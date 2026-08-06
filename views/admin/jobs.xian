@@ -1,0 +1,130 @@
+{{> head }}
+<body class="bg-gradient-to-br from-gray-50 to-gray-100">
+  <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow border-b">
+    <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-yellow-500 via-orange-500 to-red-600 bg-clip-text text-transparent">WorkBridge</h1>
+        <span class="px-3 py-1 text-xs font-semibold bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-full">Admin Panel</span>
+      </div>
+      <div>
+        <a href="/admin" class="text-gray-700 hover:text-red-600 mr-4">Dashboard</a>
+        <a href="/admin/logout" class="bg-red-500 text-white px-3 py-2 rounded-md">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container mx-auto px-6 py-10">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900">Job Postings</h2>
+        <p class="text-sm text-gray-500">Review, restore, or remove job postings from the platform.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="/admin/jobs?filter=active" class="px-4 py-2 bg-white border rounded text-indigo-600">Active</a>
+        <a href="/admin/jobs?filter=removed" class="px-4 py-2 bg-white border rounded text-red-600">Removed</a>
+        <a href="/admin" class="px-4 py-2 bg-white border rounded">Back</a>
+      </div>
+    </div>
+
+    {{#if success_msg}}
+      <div class="p-4 mb-6 bg-green-50 border border-green-200 text-green-800 rounded">{{success_msg}}</div>
+    {{/if}}
+
+    <div class="grid md:grid-cols-2 gap-6">
+      <section class="space-y-4">
+        {{#each jobs}}
+          <article class="bg-white rounded-2xl shadow p-4 border border-gray-100 hover:shadow-lg transition">
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold">💼</div>
+              <div class="flex-1">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <h3 class="font-bold text-gray-900">{{this.title}}</h3>
+                    <div class="text-xs text-gray-500">Posted by {{this.posterName}} • {{this.createdAt}}</div>
+                  </div>
+                  <div class="text-sm">
+                    {{#if this.removed}}
+                      <span class="px-2 py-1 bg-red-50 text-red-700 rounded-full text-xs">Removed</span>
+                    {{else}}
+                      <span class="px-2 py-1 bg-green-50 text-green-700 rounded-full text-xs">{{this.status}}</span>
+                    {{/if}}
+                  </div>
+                </div>
+
+                <div class="mt-3 flex items-center gap-2">
+                  <a href="/admin/jobs/{{this.id}}" class="px-3 py-1 bg-blue-600 text-white rounded">View</a>
+
+                  {{#if this.removed}}
+                    <form method="POST" action="/admin/jobs/{{this.id}}/restore" onsubmit="return confirm('Restore this job posting?');">
+                      <button class="px-3 py-1 bg-green-600 text-white rounded">Restore</button>
+                    </form>
+                  {{else}}
+                    <form method="POST" action="/admin/jobs/{{this.id}}/delete" onsubmit="return confirm('Remove this job posting?');">
+                      <button class="px-3 py-1 bg-red-600 text-white rounded">Remove</button>
+                    </form>
+                  {{/if}}
+
+                  <form method="POST" action="/admin/jobs/{{this.id}}/status" class="flex items-center gap-2">
+                    <select name="status" class="border px-2 py-1 rounded">
+                      <option value="open" {{#ifEquals this.status "open"}}selected{{/ifEquals}}>Open</option>
+                      <option value="closed" {{#ifEquals this.status "closed"}}selected{{/ifEquals}}>Closed</option>
+                      <option value="paused" {{#ifEquals this.status "paused"}}selected{{/ifEquals}}>Paused</option>
+                    </select>
+                    <button class="px-2 py-1 bg-gray-800 text-white rounded">Update</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </article>
+        {{/each}}
+      </section>
+
+      <aside class="bg-white rounded-2xl shadow p-6 border border-gray-100">
+        <h4 class="font-bold mb-3">Moderation Tips</h4>
+        <ul class="text-sm text-gray-600 space-y-2">
+          <li>• Check job description for contact info or off-platform requests.</li>
+          <li>• Ensure clear deliverables, budget, and timeline.</li>
+          <li>• Restore only if the content complies with policy.</li>
+        </ul>
+
+        <div class="mt-6">
+          <h4 class="font-semibold">Quick Filters</h4>
+          <div class="flex flex-col gap-2 mt-2">
+            <a href="/admin/jobs?filter=recent" class="px-3 py-2 border rounded text-sm">Recently Posted</a>
+            <a href="/admin/jobs?filter=flagged" class="px-3 py-2 border rounded text-sm">Flagged</a>
+            <a href="/admin/jobs?filter=removed" class="px-3 py-2 border rounded text-sm text-red-600">Removed</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="mt-6 text-sm text-gray-500">
+      <a href="/admin" class="mr-4">Back to admin</a>
+      <a href="/admin/audit">View audit logs</a>
+    </div>
+    
+    {{#if pagination}}
+      <div class="mt-6 flex items-center justify-between">
+        <div class="text-sm text-gray-600">Page {{pagination.page}} of {{pagination.totalPages}} — {{pagination.total}} results</div>
+        <div class="flex items-center gap-2">
+          {{#ifGt pagination.page 1}}
+            <a href="?page={{dec pagination.page}}{{#if filter}}&filter={{filter}}{{/if}}" class="px-3 py-1 border rounded">Previous</a>
+          {{else}}
+            <span class="px-3 py-1 border rounded text-gray-400">Previous</span>
+          {{/ifGt}}
+          <span class="text-sm text-gray-600 px-2">Page {{pagination.page}}</span>
+          {{#ifGt pagination.totalPages pagination.page}}
+            <a href="?page={{inc pagination.page}}{{#if filter}}&filter={{filter}}{{/if}}" class="px-3 py-1 bg-red-600 text-white rounded">Next</a>
+          {{else}}
+            <span class="px-3 py-1 border rounded text-gray-400">Next</span>
+          {{/ifGt}}
+        </div>
+      </div>
+    {{/if}}
+  </main>
+
+  
+
+  
+</body>
+</html>
