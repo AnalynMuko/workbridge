@@ -16,6 +16,7 @@ services:
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          connectionString: workbridge-db
+          name: workbridge-db
+          property: connectionString
       - key: SESSION_SECRET
         value: "replace_with_a_secret_value"
