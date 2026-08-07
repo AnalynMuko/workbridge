@@ -1,10 +1,10 @@
-databases:
-  - name: workbridge-db
+services:
+  - type: database
+    name: workbridge-db
     plan: starter
     region: oregon
     databaseName: workbridge
 
-services:
   - type: web
     name: workbridge
     env: node
