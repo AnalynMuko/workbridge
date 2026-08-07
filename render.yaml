@@ -18,5 +18,7 @@ services:
         fromDatabase:
           name: workbridge-db
           property: connectionString
+      - key: DB_DIALECT
+        value: postgres
       - key: SESSION_SECRET
         value: "replace_with_a_secret_value"
