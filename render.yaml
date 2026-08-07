@@ -1,5 +1,5 @@
 services:
-  - type: postgres
+  - type: postgresql
     name: workbridge-db
     plan: starter
     region: oregon
