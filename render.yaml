@@ -1,12 +1,11 @@
-services:
-  - type: database
-    name: workbridge-db
+databases:
+  - name: workbridge-db
     plan: starter
     region: oregon
-    databaseName: workbridge
     engine: postgres
     version: 15
 
+services:
   - type: web
     name: workbridge
     env: node
