@@ -27,23 +27,26 @@
 import { Sequelize } from "sequelize";
 
 const databaseUrl = process.env.DATABASE_URL;
+const dbDialect = process.env.DB_DIALECT || "mysql";
 const dbName = process.env.DB_NAME || "plshey";
 const dbUser = process.env.DB_USER || "root";
 const dbPass = process.env.DB_PASS || "";
 const dbHost = process.env.DB_HOST || "localhost";
-const dbPort = process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306;
+const dbPort = process.env.DB_PORT
+  ? Number(process.env.DB_PORT)
+  : dbDialect === "postgres"
+  ? 5432
+  : 3306;
 
-const commonOptions = {
-  dialect: "mysql",
+const connectionOptions = {
+  host: dbHost,
+  port: dbPort,
+  dialect: dbDialect,
   dialectOptions: {
     connectTimeout: 10000
   }
 };
 
 export const sequelize = databaseUrl
-  ? new Sequelize(databaseUrl, commonOptions)
-  : new Sequelize(dbName, dbUser, dbPass, {
-      host: dbHost,
-      port: dbPort,
-      ...commonOptions
-    });
+  ? new Sequelize(databaseUrl)
+  : new Sequelize(dbName, dbUser, dbPass, connectionOptions);

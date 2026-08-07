@@ -24,34 +24,30 @@
     SOFTWARE.
     */
     
-import { Sequelize } from "sequelize";
 import { sequelize } from "./models/db.js";
-import { User } from "./models/userModel.js";
-import { Profile } from "./models/Profile.js";
 import inquirer from "inquirer";
 
-// Server-level connection (no database selected)
-const rootSequelize = new Sequelize("mysql://root:@localhost:3306/");
+const dbName = process.env.DB_NAME || "plshey";
+const dbDialect = process.env.DB_DIALECT || "mysql";
 
-const DB_NAME = "plshey";
-const { createDb } = await inquirer.prompt([
+const { confirm } = await inquirer.prompt([
   {
     type: "confirm",
-    name: "createDb",
-    message: `Database '${DB_NAME}' may not exist. Create it?`,
-    default: true,
+    name: "confirm",
+    message: `This will connect to the configured ${dbDialect.toUpperCase()} database (${dbName}) and recreate all tables. Continue?`,
+    default: false,
   },
 ]);
 
-if (createDb) {
-  await rootSequelize.query(`CREATE DATABASE IF NOT EXISTS ${DB_NAME};`);
-  console.log(`✅ Database '${DB_NAME}' created (if it did not exist)`);
+if (!confirm) {
+  console.log("Migration canceled.");
+  process.exit(0);
 }
 
 try {
   await sequelize.authenticate();
-  console.log("✅ Connected to MySQL database!");
-  await sequelize.sync({ force: true }); // Drops and recreates tables
+  console.log(`✅ Connected to ${dbDialect.toUpperCase()} database!`);
+  await sequelize.sync({ force: true });
   console.log("✅ Tables created for all models!");
 } catch (err) {
   console.error("❌ Migration failed:", err);
