@@ -2,8 +2,7 @@ databases:
   - name: workbridge-db
     plan: starter
     region: oregon
-    engine: postgres
-    version: 15
+    databaseName: workbridge
 
 services:
   - type: web
@@ -16,6 +15,7 @@ services:
     autoDeploy: true
     envVars:
       - key: DATABASE_URL
-        fromDatabase: workbridge-db
+        fromDatabase:
+          name: workbridge-db
       - key: SESSION_SECRET
         value: "replace_with_a_secret_value"
