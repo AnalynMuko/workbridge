@@ -1,4 +1,10 @@
 services:
+  - type: postgres
+    name: workbridge-db
+    plan: starter
+    region: oregon
+    databaseName: workbridge
+
   - type: web
     name: workbridge
     env: node
@@ -9,23 +15,6 @@ services:
     autoDeploy: true
     envVars:
       - key: DATABASE_URL
-        value: null
-        sync: false
-      - key: DB_HOST
-        value: null
-        sync: false
-      - key: DB_PORT
-        value: null
-        sync: false
-      - key: DB_NAME
-        value: null
-        sync: false
-      - key: DB_USER
-        value: null
-        sync: false
-      - key: DB_PASS
-        value: null
-        sync: false
+        fromDatabase: workbridge-db
       - key: SESSION_SECRET
-        value: null
-        sync: false
+        value: "replace_with_a_secret_value"
