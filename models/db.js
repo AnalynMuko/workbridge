@@ -26,8 +26,13 @@
     
 import { Sequelize } from "sequelize";
 
-const databaseUrl = process.env.DATABASE_URL;
-const dbDialect = process.env.DB_DIALECT || "mysql";
+const databaseUrl = process.env.DATABASE_URL || "";
+const inferredDbDialect = databaseUrl.startsWith("postgres://") || databaseUrl.startsWith("postgresql://")
+  ? "postgres"
+  : databaseUrl.startsWith("mysql://")
+  ? "mysql"
+  : null;
+const dbDialect = process.env.DB_DIALECT || inferredDbDialect || "mysql";
 const dbName = process.env.DB_NAME || "plshey";
 const dbUser = process.env.DB_USER || "root";
 const dbPass = process.env.DB_PASS || "";
@@ -38,15 +43,21 @@ const dbPort = process.env.DB_PORT
   ? 5432
   : 3306;
 
+const dialectOptions = {
+  connectTimeout: 10000
+};
+
+if (dbDialect === "postgres") {
+  dialectOptions.ssl = { rejectUnauthorized: false };
+}
+
 const connectionOptions = {
   host: dbHost,
   port: dbPort,
   dialect: dbDialect,
-  dialectOptions: {
-    connectTimeout: 10000
-  }
+  dialectOptions
 };
 
 export const sequelize = databaseUrl
-  ? new Sequelize(databaseUrl)
+  ? new Sequelize(databaseUrl, { dialect: dbDialect, dialectOptions })
   : new Sequelize(dbName, dbUser, dbPass, connectionOptions);
