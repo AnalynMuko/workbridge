@@ -26,13 +26,27 @@
     
 import { Sequelize } from "sequelize";
 
-const databaseUrl = process.env.DATABASE_URL || "";
+const databaseUrl =
+  process.env.DATABASE_URL ||
+  process.env.POSTGRES_URL ||
+  process.env.POSTGRESQL_URL ||
+  process.env.DB_URL ||
+  "";
 const inferredDbDialect = databaseUrl.startsWith("postgres://") || databaseUrl.startsWith("postgresql://")
   ? "postgres"
   : databaseUrl.startsWith("mysql://")
   ? "mysql"
   : null;
-const dbDialect = process.env.DB_DIALECT || inferredDbDialect || "mysql";
+const explicitDbDialect = process.env.DB_DIALECT || null;
+
+let dbDialect = explicitDbDialect || inferredDbDialect || "mysql";
+if (databaseUrl && inferredDbDialect && explicitDbDialect && explicitDbDialect !== inferredDbDialect) {
+  console.warn(
+    `DATABASE_URL indicates ${inferredDbDialect} but DB_DIALECT=${explicitDbDialect}; using ${inferredDbDialect}`
+  );
+  dbDialect = inferredDbDialect;
+}
+
 const dbName = process.env.DB_NAME || "plshey";
 const dbUser = process.env.DB_USER || "root";
 const dbPass = process.env.DB_PASS || "";
@@ -57,6 +71,23 @@ const connectionOptions = {
   dialect: dbDialect,
   dialectOptions
 };
+
+console.log(
+  "Database config:",
+  JSON.stringify(
+    {
+      dbDialect,
+      explicitDbDialect,
+      inferredDbDialect,
+      hasDatabaseUrl: Boolean(databaseUrl),
+      databaseUrlPrefix: databaseUrl ? databaseUrl.split(":")[0] : null,
+      dbHost,
+      dbPort
+    },
+    null,
+    2
+  )
+);
 
 export const sequelize = databaseUrl
   ? new Sequelize(databaseUrl, { dialect: dbDialect, dialectOptions })
